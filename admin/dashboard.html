@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ResQLink Admin — Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --primary: #dc2626;
+      --primary-dark: #b91c1c;
+      --bg: #0f172a;
+      --sidebar: #1e293b;
+      --card: #1e293b;
+      --card-border: #334155;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --info: #3b82f6;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--card-border);
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+    }
+
+    .sidebar-logo {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-logo .icon {
+      width: 36px;
+      height: 36px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .sidebar-logo h2 {
+      font-size: 16px;
+      letter-spacing: -0.3px;
+    }
+
+    .sidebar-logo h2 span { color: var(--primary); }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+    }
+
+    .nav-section {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      padding: 8px 12px 6px;
+      margin-top: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--text-muted);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+    .nav-item.active { background: rgba(220, 38, 38, 0.15); color: var(--primary); }
+
+    .nav-icon {
+      width: 20px;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    .sidebar-footer {
+      padding: 16px 12px;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .user-name { font-size: 13px; font-weight: 500; }
+    .user-role { font-size: 11px; color: var(--text-muted); }
+
+    .logout-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      transition: all 0.15s;
+    }
+
+    .logout-btn:hover { background: rgba(239,68,68,0.1); color: var(--error, #ef4444); }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      margin-left: 250px;
+      padding: 24px 32px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .header h1 { font-size: 22px; font-weight: 700; }
+    .header p { color: var(--text-muted); font-size: 14px; margin-top: 2px; }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .badge-live {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .stat-card .label {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-card .value {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .stat-card .change {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .stat-card .change.up { color: var(--success); }
+    .stat-card .change.down { color: var(--error, #ef4444); }
+
+    /* Table */
+    .table-section {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .table-header h3 { font-size: 15px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      padding: 10px 20px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    td {
+      padding: 12px 20px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-active { background: rgba(34,197,94,0.15); color: var(--success); }
+    .status-busy { background: rgba(245,158,11,0.15); color: var(--warning); }
+    .status-offline { background: rgba(148,163,184,0.15); color: var(--text-muted); }
+
+    .role-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .role-admin { background: rgba(220,38,38,0.15); color: var(--primary); }
+    .role-driver { background: rgba(59,130,246,0.15); color: var(--info); }
+    .role-paramedic { background: rgba(34,197,94,0.15); color: var(--success); }
+    .role-user { background: rgba(148,163,184,0.15); color: var(--text-muted); }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .empty-state p { font-size: 14px; }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="icon">+</div>
+      <h2>Res<span>Q</span>Link</h2>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">Overview</div>
+      <a class="nav-item active"><span class="nav-icon">&#9632;</span> Dashboard</a>
+
+      <div class="nav-section">Management</div>
+      <a class="nav-item" id="navUsers"><span class="nav-icon">&#9679;</span> Users</a>
+      <a class="nav-item"><span class="nav-icon">&#9670;</span> Ambulances</a>
+      <a class="nav-item"><span class="nav-icon">&#9733;</span> Hospitals</a>
+      <a class="nav-item"><span class="nav-icon">&#9998;</span> Paramedics</a>
+
+      <div class="nav-section">Operations</div>
+      <a class="nav-item"><span class="nav-icon">&#10148;</span> Ride Requests</a>
+      <a class="nav-item"><span class="nav-icon">&#9737;</span> Live Tracking</a>
+      <a class="nav-item"><span class="nav-icon">&#9993;</span> Dispatch</a>
+
+      <div class="nav-section">Reports</div>
+      <a class="nav-item"><span class="nav-icon">&#9776;</span> Driver Performance</a>
+      <a class="nav-item"><span class="nav-icon">&#8942;</span> Admin Logs</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="avatar" id="userAvatar">A</div>
+        <div>
+          <div class="user-name" id="userName">Admin</div>
+          <div class="user-role">Administrator</div>
+        </div>
+      </div>
+      <button class="logout-btn" id="logoutBtn">
+        <span class="nav-icon">&#10140;</span> Sign out
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="header">
+      <div>
+        <h1>Dashboard</h1>
+        <p>Welcome back, <span id="greeting">Admin</span></p>
+      </div>
+      <div class="badge badge-live"><span class="dot"></span> System Online</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="label">Total Users</div>
+        <div class="value" id="statUsers">--</div>
+        <div class="change up">Registered accounts</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Active Drivers</div>
+        <div class="value" id="statDrivers">--</div>
+        <div class="change up">On duty now</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Paramedics</div>
+        <div class="value" id="statParamedics">--</div>
+        <div class="change">Available</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Ride Requests</div>
+        <div class="value" id="statRides">--</div>
+        <div class="change">Today</div>
+      </div>
+    </div>
+
+    <!-- Recent Users Table -->
+    <div class="table-section">
+      <div class="table-header">
+        <h3>Recent Users</h3>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email / Phone</th>
+            <th>Role</th>
+            <th>Verified</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody id="usersTable">
+          <tr><td colspan="5" class="empty-state"><p>Loading users...</p></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    const API = 'http://localhost:3001/api';
+    const token = localStorage.getItem('accessToken');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+    // Auth check
+    if (!token || !user || user.role !== 'ADMIN') {
+      localStorage.clear();
+      window.location.href = 'login.html';
+    }
+
+    // Set user info
+    document.getElementById('userName').textContent = user.name;
+    document.getElementById('greeting').textContent = user.name.split(' ')[0];
+    document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.clear();
+      window.location.href = 'login.html';
+    });
+
+    // Fetch helpers
+    async function apiFetch(path) {
+      const res = await fetch(`${API}${path}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.status === 401) {
+        localStorage.clear();
+        window.location.href = 'login.html';
+        return null;
+      }
+      return res.json();
+    }
+
+    // Load dashboard data
+    async function loadDashboard() {
+      try {
+        const users = await apiFetch('/users');
+        if (!users) return;
+
+        // Stats
+        document.getElementById('statUsers').textContent = users.length;
+        document.getElementById('statDrivers').textContent =
+          users.filter(u => u.role === 'DRIVER' && u.isActive).length;
+        document.getElementById('statParamedics').textContent =
+          users.filter(u => u.role === 'PARAMEDIC').length;
+        document.getElementById('statRides').textContent = '0';
+
+        // Table
+        const tbody = document.getElementById('usersTable');
+        if (users.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><p>No users found</p></td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = users.slice(0, 10).map(u => `
+          <tr>
+            <td>${u.name}</td>
+            <td>${u.email || u.phone || '—'}</td>
+            <td><span class="role-badge role-${u.role.toLowerCase()}">${u.role}</span></td>
+            <td><span class="status-badge ${u.verified ? 'status-active' : 'status-offline'}">${u.verified ? 'Yes' : 'No'}</span></td>
+            <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        console.error('Dashboard load error:', err);
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>
