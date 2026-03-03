@@ -14,6 +14,19 @@ const SALT_ROUNDS = 10;
 async function main() {
   console.log('🌱 Seeding ResQLink database...\n');
 
+  // ── 0. Clean existing data (reverse dependency order) ─────────
+  await prisma.ambulanceTracking.deleteMany();
+  await prisma.rideRequestAttempt.deleteMany();
+  await prisma.chat.deleteMany();
+  await prisma.adminAction.deleteMany();
+  await prisma.driverPerformance.deleteMany();
+  await prisma.rideRequest.deleteMany();
+  await prisma.paramedicProfile.deleteMany();
+  await prisma.ambulance.deleteMany();
+  await prisma.hospital.deleteMany();
+  await prisma.organization.deleteMany();
+  console.log('  🧹 Cleared existing seed data\n');
+
   // ── 1. Users (all 4 roles) ──────────────────────────────────────
   const adminPassword = await bcrypt.hash('Admin@1234', SALT_ROUNDS);
   const userPassword = await bcrypt.hash('Patient@1234', SALT_ROUNDS);
