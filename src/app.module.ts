@@ -21,7 +21,7 @@ import { ParamedicProfilesModule } from './modules/paramedic-profiles/paramedic-
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'admin'),
+      rootPath: join(__dirname, '..', '..', 'admin'),
       serveRoot: '/admin',
     }),
     ConfigModule, CommonModule, AuthModule, UsersModule, OrganizationsModule, HospitalsModule, AmbulancesModule, RideRequestsModule, DispatchModule, TrackingModule, ChatsModule, AdminActionsModule, DriverPerformanceModule, ParamedicProfilesModule],

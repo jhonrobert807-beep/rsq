@@ -10,6 +10,7 @@
     :root {
       --primary: #dc2626;
       --primary-dark: #b91c1c;
+      --primary-light: rgba(220, 38, 38, 0.15);
       --bg: #0f172a;
       --sidebar: #1e293b;
       --card: #1e293b;
@@ -19,6 +20,8 @@
       --success: #22c55e;
       --warning: #f59e0b;
       --info: #3b82f6;
+      --error: #ef4444;
+      --input-bg: #0f172a;
     }
 
     body {
@@ -29,7 +32,7 @@
       display: flex;
     }
 
-    /* Sidebar */
+    /* ─── Sidebar ─── */
     .sidebar {
       width: 250px;
       background: var(--sidebar);
@@ -40,6 +43,7 @@
       position: fixed;
       top: 0;
       bottom: 0;
+      z-index: 100;
     }
 
     .sidebar-logo {
@@ -51,279 +55,318 @@
     }
 
     .sidebar-logo .icon {
-      width: 36px;
-      height: 36px;
+      width: 36px; height: 36px;
       background: var(--primary);
       border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700; color: #fff;
     }
 
-    .sidebar-logo h2 {
-      font-size: 16px;
-      letter-spacing: -0.3px;
-    }
-
+    .sidebar-logo h2 { font-size: 16px; letter-spacing: -0.3px; }
     .sidebar-logo h2 span { color: var(--primary); }
 
-    .sidebar-nav {
-      flex: 1;
-      padding: 16px 12px;
-    }
+    .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
 
     .nav-section {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      padding: 8px 12px 6px;
-      margin-top: 8px;
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--text-muted); padding: 8px 12px 6px; margin-top: 8px;
     }
 
     .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      color: var(--text-muted);
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.15s;
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: 8px; font-size: 14px;
+      color: var(--text-muted); text-decoration: none; cursor: pointer;
+      transition: all 0.15s; border: none; background: none; width: 100%;
     }
 
     .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
-    .nav-item.active { background: rgba(220, 38, 38, 0.15); color: var(--primary); }
+    .nav-item.active { background: var(--primary-light); color: var(--primary); }
 
-    .nav-icon {
-      width: 20px;
-      text-align: center;
-      font-size: 15px;
-    }
+    .nav-icon { width: 20px; text-align: center; font-size: 15px; }
 
-    .sidebar-footer {
-      padding: 16px 12px;
-      border-top: 1px solid var(--card-border);
-    }
+    .sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--card-border); }
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-    }
+    .user-info { display: flex; align-items: center; gap: 10px; padding: 8px 12px; }
 
     .avatar {
-      width: 32px;
-      height: 32px;
-      background: var(--primary);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 600;
+      width: 32px; height: 32px; background: var(--primary); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; color: #fff;
     }
 
     .user-name { font-size: 13px; font-weight: 500; }
     .user-role { font-size: 11px; color: var(--text-muted); }
 
     .logout-btn {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 12px;
-      border-radius: 8px;
-      font-size: 13px;
-      color: var(--text-muted);
-      cursor: pointer;
-      border: none;
-      background: none;
-      width: 100%;
-      transition: all 0.15s;
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: 8px; font-size: 13px;
+      color: var(--text-muted); cursor: pointer; border: none;
+      background: none; width: 100%; transition: all 0.15s;
     }
 
-    .logout-btn:hover { background: rgba(239,68,68,0.1); color: var(--error, #ef4444); }
+    .logout-btn:hover { background: rgba(239,68,68,0.1); color: var(--error); }
 
-    /* Main Content */
-    .main {
-      flex: 1;
-      margin-left: 250px;
-      padding: 24px 32px;
+    /* ─── Main Content ─── */
+    .main { flex: 1; margin-left: 250px; padding: 24px 32px; min-height: 100vh; }
+
+    .page-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px;
     }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 28px;
-    }
-
-    .header h1 { font-size: 22px; font-weight: 700; }
-    .header p { color: var(--text-muted); font-size: 14px; margin-top: 2px; }
+    .page-header h1 { font-size: 22px; font-weight: 700; }
+    .page-header p { color: var(--text-muted); font-size: 14px; margin-top: 2px; }
 
     .badge {
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
+      padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500;
     }
 
     .badge-live {
-      background: rgba(34, 197, 94, 0.15);
-      color: var(--success);
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      background: rgba(34,197,94,0.15); color: var(--success);
+      display: flex; align-items: center; gap: 6px;
     }
 
     .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--success);
+      width: 7px; height: 7px; border-radius: 50%; background: var(--success);
       animation: pulse 1.5s infinite;
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-    /* Stats Grid */
+    /* ─── Stats Grid ─── */
     .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 28px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin-bottom: 24px;
     }
 
     .stat-card {
-      background: var(--card);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 20px;
+      background: var(--card); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 20px;
     }
 
-    .stat-card .label {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-    }
+    .stat-card .label { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+    .stat-card .value { font-size: 28px; font-weight: 700; }
+    .stat-card .sub { font-size: 12px; margin-top: 4px; color: var(--text-muted); }
 
-    .stat-card .value {
-      font-size: 28px;
-      font-weight: 700;
-    }
-
-    .stat-card .change {
-      font-size: 12px;
-      margin-top: 4px;
-    }
-
-    .stat-card .change.up { color: var(--success); }
-    .stat-card .change.down { color: var(--error, #ef4444); }
-
-    /* Table */
+    /* ─── Table ─── */
     .table-section {
-      background: var(--card);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      overflow: hidden;
-      margin-bottom: 20px;
+      background: var(--card); border: 1px solid var(--card-border);
+      border-radius: 12px; overflow: hidden; margin-bottom: 20px;
     }
 
     .table-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--card-border);
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 20px; border-bottom: 1px solid var(--card-border);
     }
 
     .table-header h3 { font-size: 15px; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+    .table-actions { display: flex; gap: 8px; align-items: center; }
+
+    table { width: 100%; border-collapse: collapse; }
 
     th {
-      text-align: left;
-      padding: 10px 20px;
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-      border-bottom: 1px solid var(--card-border);
+      text-align: left; padding: 10px 20px; font-size: 12px;
+      color: var(--text-muted); font-weight: 500; text-transform: uppercase;
+      letter-spacing: 0.3px; border-bottom: 1px solid var(--card-border);
     }
 
     td {
-      padding: 12px 20px;
-      font-size: 14px;
+      padding: 12px 20px; font-size: 14px;
       border-bottom: 1px solid var(--card-border);
     }
 
     tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
 
     .status-badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 12px; font-weight: 500;
     }
 
-    .status-available { background: rgba(34,197,94,0.15); color: var(--success); }
-    .status-busy { background: rgba(245,158,11,0.15); color: var(--warning); }
-    .status-offline { background: rgba(148,163,184,0.15); color: var(--text-muted); }
-    .status-maintenance { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .status-available, .status-verified { background: rgba(34,197,94,0.15); color: var(--success); }
+    .status-busy, .status-dispatching, .status-pending, .status-waiting_driver_accept { background: rgba(245,158,11,0.15); color: var(--warning); }
+    .status-offline, .status-completed { background: rgba(148,163,184,0.15); color: var(--text-muted); }
+    .status-maintenance, .status-cancelled, .status-rejected, .status-failed_no_driver { background: rgba(239,68,68,0.15); color: var(--error); }
     .status-created { background: rgba(59,130,246,0.15); color: var(--info); }
-    .status-dispatching { background: rgba(245,158,11,0.15); color: var(--warning); }
-    .status-in_trip { background: rgba(34,197,94,0.15); color: var(--success); }
-    .status-completed { background: rgba(148,163,184,0.15); color: var(--text-muted); }
-    .status-cancelled { background: rgba(239,68,68,0.15); color: #ef4444; }
-    .status-pending { background: rgba(245,158,11,0.15); color: var(--warning); }
-    .status-verified { background: rgba(34,197,94,0.15); color: var(--success); }
-    .status-rejected { background: rgba(239,68,68,0.15); color: #ef4444; }
+    .status-in_trip, .status-driver_accepted, .status-driver_arrived { background: rgba(34,197,94,0.15); color: var(--success); }
 
-    .empty-state {
-      text-align: center;
-      padding: 40px;
+    .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+
+    /* ─── Buttons ─── */
+    .btn {
+      padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.15s; color: #fff;
+    }
+
+    .btn-primary { background: var(--primary); }
+    .btn-primary:hover { background: var(--primary-dark); }
+
+    .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+    .btn-success { background: var(--success); }
+    .btn-warning { background: var(--warning); color: #000; }
+    .btn-danger { background: var(--error); }
+    .btn-info { background: var(--info); }
+
+    .btn-outline {
+      background: transparent; border: 1px solid var(--card-border); color: var(--text);
+    }
+    .btn-outline:hover { border-color: var(--text-muted); }
+
+    .btn-icon {
+      padding: 6px 10px; background: transparent; border: 1px solid var(--card-border);
+      color: var(--text-muted); border-radius: 6px; cursor: pointer; font-size: 14px;
+    }
+    .btn-icon:hover { color: var(--text); border-color: var(--text-muted); }
+
+    /* ─── Forms / Modal ─── */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7); display: flex; align-items: center;
+      justify-content: center; z-index: 1000;
+    }
+
+    .modal {
+      background: var(--sidebar); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 24px; width: 100%; max-width: 500px;
+      max-height: 90vh; overflow-y: auto;
+    }
+
+    .modal h2 { font-size: 18px; margin-bottom: 20px; }
+
+    .form-group { margin-bottom: 16px; }
+
+    .form-group label {
+      display: block; font-size: 13px; font-weight: 500;
+      color: var(--text-muted); margin-bottom: 6px;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 10px 14px; background: var(--input-bg);
+      border: 1px solid var(--card-border); border-radius: 8px;
+      color: var(--text); font-size: 14px; outline: none; transition: border-color 0.2s;
+    }
+
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .form-group input::placeholder, .form-group textarea::placeholder { color: #475569; }
+
+    .form-group select option { background: var(--sidebar); color: var(--text); }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+    /* ─── Filters ─── */
+    .filters {
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: 7px 12px; background: var(--input-bg); border: 1px solid var(--card-border);
+      border-radius: 8px; color: var(--text); font-size: 13px; outline: none;
+    }
+
+    .filter-select option { background: var(--sidebar); }
+
+    /* ─── Toast ─── */
+    .toast-container {
+      position: fixed; top: 20px; right: 20px; z-index: 2000;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .toast {
+      padding: 12px 20px; border-radius: 8px; font-size: 14px;
+      font-weight: 500; animation: slideIn 0.3s ease;
+      min-width: 280px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .toast-success { background: #166534; color: #bbf7d0; }
+    .toast-error { background: #991b1b; color: #fecaca; }
+    .toast-info { background: #1e40af; color: #bfdbfe; }
+
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* ─── Loading ─── */
+    .spinner-inline {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+      border-radius: 50%; animation: spin 0.6s linear infinite;
+      vertical-align: middle; margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-row td { text-align: center; padding: 40px; color: var(--text-muted); }
+
+    /* ─── Tracking Map Placeholder ─── */
+    .map-container {
+      background: var(--card); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 20px; margin-bottom: 20px;
+      min-height: 300px; position: relative;
+    }
+
+    .map-placeholder {
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px; min-height: 260px;
       color: var(--text-muted);
     }
 
-    .empty-state p { font-size: 14px; }
+    .ambulance-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      display: inline-block; margin-right: 6px;
+    }
+
+    .dot-available { background: var(--success); }
+    .dot-busy { background: var(--warning); }
+    .dot-offline { background: var(--text-muted); }
+    .dot-maintenance { background: var(--error); }
+
+    /* ─── Detail Cards ─── */
+    .detail-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px; margin-bottom: 20px;
+    }
+
+    .detail-card {
+      background: var(--card); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 20px;
+    }
+
+    .detail-card h4 { font-size: 14px; color: var(--text-muted); margin-bottom: 12px; }
+
+    .detail-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
+    .detail-row .label { color: var(--text-muted); }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
-  <!-- Sidebar — Items match ResQLink project document requirements -->
+  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-logo">
       <div class="icon">+</div>
       <h2>Res<span>Q</span>Link</h2>
     </div>
 
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" id="sidebarNav">
       <div class="nav-section">Overview</div>
-      <a class="nav-item active"><span class="nav-icon">&#9632;</span> Dashboard</a>
+      <button class="nav-item active" data-page="dashboard"><span class="nav-icon">&#9632;</span> Dashboard</button>
 
       <div class="nav-section">Management</div>
-      <a class="nav-item"><span class="nav-icon">&#9670;</span> Ambulances</a>
-      <a class="nav-item"><span class="nav-icon">&#9998;</span> Paramedic Profiles</a>
+      <button class="nav-item" data-page="ambulances"><span class="nav-icon">&#9670;</span> Ambulances</button>
+      <button class="nav-item" data-page="paramedics"><span class="nav-icon">&#9998;</span> Paramedic Profiles</button>
 
       <div class="nav-section">Operations</div>
-      <a class="nav-item"><span class="nav-icon">&#10148;</span> Ride Requests</a>
-      <a class="nav-item"><span class="nav-icon">&#9737;</span> Live Tracking</a>
-      <a class="nav-item"><span class="nav-icon">&#9993;</span> Dispatch</a>
+      <button class="nav-item" data-page="rides"><span class="nav-icon">&#10148;</span> Ride Requests</button>
+      <button class="nav-item" data-page="tracking"><span class="nav-icon">&#9737;</span> Live Tracking</button>
+      <button class="nav-item" data-page="dispatch"><span class="nav-icon">&#9993;</span> Dispatch</button>
 
       <div class="nav-section">Monitoring</div>
-      <a class="nav-item"><span class="nav-icon">&#9776;</span> Driver Performance</a>
+      <button class="nav-item" data-page="performance"><span class="nav-icon">&#9776;</span> Driver Performance</button>
     </nav>
 
     <div class="sidebar-footer">
@@ -341,182 +384,930 @@
   </aside>
 
   <!-- Main Content -->
-  <main class="main">
-    <div class="header">
-      <div>
-        <h1>Dashboard</h1>
-        <p>Welcome back, <span id="greeting">Admin</span></p>
-      </div>
-      <div class="badge badge-live"><span class="dot"></span> System Online</div>
-    </div>
+  <main class="main" id="mainContent"></main>
 
-    <!-- Stats — from document: active ambulances, pending requests, driver performance, paramedics -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="label">Active Ambulances</div>
-        <div class="value" id="statAmbulances">--</div>
-        <div class="change up">Currently available</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">Pending Requests</div>
-        <div class="value" id="statPending">--</div>
-        <div class="change">Awaiting dispatch</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">Active Rides</div>
-        <div class="value" id="statActiveRides">--</div>
-        <div class="change up">In progress now</div>
-      </div>
-      <div class="stat-card">
-        <div class="label">Paramedics</div>
-        <div class="value" id="statParamedics">--</div>
-        <div class="change">Verified profiles</div>
-      </div>
-    </div>
-
-    <!-- Active Ambulances Table — document: "Tracks active ambulances" -->
-    <div class="table-section">
-      <div class="table-header">
-        <h3>Registered Ambulances</h3>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Registration</th>
-            <th>Type</th>
-            <th>Status</th>
-            <th>Organization</th>
-            <th>Location</th>
-          </tr>
-        </thead>
-        <tbody id="ambulancesTable">
-          <tr><td colspan="5" class="empty-state"><p>Loading ambulances...</p></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Pending Ride Requests Table — document: "pending requests, incoming emergency requests" -->
-    <div class="table-section">
-      <div class="table-header">
-        <h3>Pending Ride Requests</h3>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Requested By</th>
-            <th>Type</th>
-            <th>Status</th>
-            <th>Pickup Location</th>
-            <th>Requested At</th>
-          </tr>
-        </thead>
-        <tbody id="ridesTable">
-          <tr><td colspan="5" class="empty-state"><p>Loading requests...</p></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </main>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
 
   <script>
-    const API = 'http://localhost:3001/api';
+    // ═══════════════════════════════════════════════════════════════
+    // CORE: Auth, API, Router
+    // ═══════════════════════════════════════════════════════════════
+    const API = window.location.origin + '/api';
     const token = localStorage.getItem('accessToken');
     const user = JSON.parse(localStorage.getItem('user') || 'null');
 
-    // Auth check
     if (!token || !user || user.role !== 'ADMIN') {
       localStorage.clear();
       window.location.href = 'login.html';
     }
 
-    // Set user info
     document.getElementById('userName').textContent = user.name;
-    document.getElementById('greeting').textContent = user.name.split(' ')[0];
     document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
 
-    // Logout
     document.getElementById('logoutBtn').addEventListener('click', () => {
       localStorage.clear();
       window.location.href = 'login.html';
     });
 
-    // Fetch helper
-    async function apiFetch(path) {
+    // ── API helper ───
+    async function apiFetch(path, options = {}) {
       const res = await fetch(`${API}${path}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          ...(options.headers || {}),
+        },
       });
       if (res.status === 401) {
         localStorage.clear();
         window.location.href = 'login.html';
         return null;
       }
-      return res.json();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Request failed');
+      return data;
     }
 
-    function statusClass(status) {
-      return 'status-' + status.toLowerCase().replace(/_/g, '_');
+    // ── Toast ───
+    function toast(msg, type = 'success') {
+      const el = document.createElement('div');
+      el.className = `toast toast-${type}`;
+      el.textContent = msg;
+      document.getElementById('toastContainer').appendChild(el);
+      setTimeout(() => el.remove(), 4000);
     }
 
-    // Load dashboard data
-    async function loadDashboard() {
+    // ── Status badge helper ───
+    function statusBadge(status) {
+      const cls = 'status-' + status.toLowerCase();
+      const label = status.replace(/_/g, ' ');
+      return `<span class="status-badge ${cls}">${label}</span>`;
+    }
+
+    // ── Format date ───
+    function fmtDate(d) {
+      if (!d) return '—';
+      return new Date(d).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+    }
+
+    // ── GPS display ───
+    function fmtGps(lat, lng) {
+      if (lat == null || lng == null) return 'No GPS';
+      return `${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // SPA ROUTER
+    // ═══════════════════════════════════════════════════════════════
+    const pages = {};
+    let currentPage = 'dashboard';
+
+    function navigate(page) {
+      currentPage = page;
+      document.querySelectorAll('.nav-item').forEach(n => {
+        n.classList.toggle('active', n.dataset.page === page);
+      });
+      if (pages[page]) pages[page]();
+    }
+
+    document.querySelectorAll('.nav-item[data-page]').forEach(btn => {
+      btn.addEventListener('click', () => navigate(btn.dataset.page));
+    });
+
+    // ═══════════════════════════════════════════════════════════════
+    // PAGE: Dashboard
+    // ═══════════════════════════════════════════════════════════════
+    pages.dashboard = async () => {
+      const main = document.getElementById('mainContent');
+      main.innerHTML = `
+        <div class="page-header">
+          <div>
+            <h1>Dashboard</h1>
+            <p>Welcome back, ${user.name.split(' ')[0]}</p>
+          </div>
+          <div class="badge badge-live"><span class="dot"></span> System Online</div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="label">Active Ambulances</div><div class="value" id="s-amb">--</div><div class="sub">Currently available</div></div>
+          <div class="stat-card"><div class="label">Pending Requests</div><div class="value" id="s-pend">--</div><div class="sub">Awaiting dispatch</div></div>
+          <div class="stat-card"><div class="label">Active Rides</div><div class="value" id="s-active">--</div><div class="sub">In progress now</div></div>
+          <div class="stat-card"><div class="label">Verified Paramedics</div><div class="value" id="s-para">--</div><div class="sub">Verified profiles</div></div>
+        </div>
+        <div class="table-section">
+          <div class="table-header"><h3>Registered Ambulances</h3></div>
+          <table><thead><tr><th>Registration</th><th>Type</th><th>Status</th><th>Organization</th><th>Location</th></tr></thead>
+          <tbody id="d-amb-table"><tr class="loading-row"><td colspan="5"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
+        </div>
+        <div class="table-section">
+          <div class="table-header"><h3>Pending Ride Requests</h3></div>
+          <table><thead><tr><th>Requested By</th><th>Type</th><th>Status</th><th>Pickup</th><th>Requested At</th></tr></thead>
+          <tbody id="d-rides-table"><tr class="loading-row"><td colspan="5"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
+        </div>
+      `;
+
       try {
-        // Fetch ambulances, ride requests, and paramedic profiles in parallel
         const [ambulances, rides, paramedics] = await Promise.all([
           apiFetch('/ambulances'),
           apiFetch('/ride-requests'),
           apiFetch('/paramedic-profiles'),
         ]);
-
         if (!ambulances) return;
 
-        // Stats
-        const availableAmbulances = ambulances.filter(a => a.status === 'AVAILABLE');
-        const pendingRides = rides ? rides.filter(r => ['CREATED', 'DISPATCHING', 'WAITING_DRIVER_ACCEPT'].includes(r.status)) : [];
-        const activeRides = rides ? rides.filter(r => ['DRIVER_ACCEPTED', 'DRIVER_ARRIVED', 'IN_TRIP'].includes(r.status)) : [];
-        const verifiedParamedics = paramedics ? paramedics.filter(p => p.status === 'VERIFIED') : [];
+        const available = ambulances.filter(a => a.status === 'AVAILABLE');
+        const pending = rides.filter(r => ['CREATED','DISPATCHING','WAITING_DRIVER_ACCEPT'].includes(r.status));
+        const active = rides.filter(r => ['DRIVER_ACCEPTED','DRIVER_ARRIVED','IN_TRIP'].includes(r.status));
+        const verified = paramedics.filter(p => p.status === 'VERIFIED');
 
-        document.getElementById('statAmbulances').textContent = availableAmbulances.length;
-        document.getElementById('statPending').textContent = pendingRides.length;
-        document.getElementById('statActiveRides').textContent = activeRides.length;
-        document.getElementById('statParamedics').textContent = verifiedParamedics.length;
+        document.getElementById('s-amb').textContent = available.length;
+        document.getElementById('s-pend').textContent = pending.length;
+        document.getElementById('s-active').textContent = active.length;
+        document.getElementById('s-para').textContent = verified.length;
 
         // Ambulances table
-        const ambTbody = document.getElementById('ambulancesTable');
-        if (ambulances.length === 0) {
-          ambTbody.innerHTML = '<tr><td colspan="5" class="empty-state"><p>No ambulances registered</p></td></tr>';
-        } else {
-          ambTbody.innerHTML = ambulances.slice(0, 10).map(a => `
-            <tr>
+        const at = document.getElementById('d-amb-table');
+        at.innerHTML = ambulances.length === 0
+          ? '<tr><td colspan="5" class="empty-state">No ambulances registered</td></tr>'
+          : ambulances.slice(0, 10).map(a => `<tr>
               <td>${a.registrationNumber || '—'}</td>
               <td>${a.type}</td>
-              <td><span class="status-badge status-${a.status.toLowerCase()}">${a.status}</span></td>
+              <td>${statusBadge(a.status)}</td>
               <td>${a.organization ? a.organization.name : '—'}</td>
-              <td>${a.currentLat ? a.currentLat.toFixed(4) + ', ' + a.currentLng.toFixed(4) : 'No GPS'}</td>
-            </tr>
-          `).join('');
-        }
+              <td>${fmtGps(a.currentLat, a.currentLng)}</td>
+            </tr>`).join('');
 
-        // Rides table — show pending + active
-        const rideTbody = document.getElementById('ridesTable');
-        const displayRides = [...pendingRides, ...activeRides];
-        if (displayRides.length === 0) {
-          rideTbody.innerHTML = '<tr><td colspan="5" class="empty-state"><p>No pending requests</p></td></tr>';
-        } else {
-          rideTbody.innerHTML = displayRides.slice(0, 10).map(r => `
-            <tr>
+        // Rides table
+        const rt = document.getElementById('d-rides-table');
+        const display = [...pending, ...active];
+        rt.innerHTML = display.length === 0
+          ? '<tr><td colspan="5" class="empty-state">No pending requests</td></tr>'
+          : display.slice(0, 10).map(r => `<tr>
               <td>${r.user ? r.user.name : '—'}</td>
               <td>${r.ambulanceType}</td>
-              <td><span class="status-badge status-${r.status.toLowerCase()}">${r.status.replace(/_/g, ' ')}</span></td>
-              <td>${r.pickupLat.toFixed(4)}, ${r.pickupLng.toFixed(4)}</td>
-              <td>${new Date(r.requestedAt).toLocaleString()}</td>
-            </tr>
-          `).join('');
-        }
-      } catch (err) {
-        console.error('Dashboard load error:', err);
+              <td>${statusBadge(r.status)}</td>
+              <td>${fmtGps(r.pickupLat, r.pickupLng)}</td>
+              <td>${fmtDate(r.requestedAt)}</td>
+            </tr>`).join('');
+      } catch (e) {
+        console.error('Dashboard error:', e);
+        toast('Failed to load dashboard data', 'error');
       }
-    }
+    };
 
-    loadDashboard();
+    // ═══════════════════════════════════════════════════════════════
+    // PAGE: Ambulances (Full CRUD)
+    // ═══════════════════════════════════════════════════════════════
+    pages.ambulances = async () => {
+      const main = document.getElementById('mainContent');
+      main.innerHTML = `
+        <div class="page-header">
+          <div><h1>Ambulances</h1><p>Manage registered ambulances</p></div>
+          <button class="btn btn-primary" id="addAmbBtn">+ Add Ambulance</button>
+        </div>
+        <div class="table-section">
+          <div class="table-header">
+            <h3>All Ambulances</h3>
+            <div class="filters">
+              <select class="filter-select" id="ambStatusFilter">
+                <option value="">All Statuses</option>
+                <option value="AVAILABLE">Available</option>
+                <option value="BUSY">Busy</option>
+                <option value="OFFLINE">Offline</option>
+                <option value="MAINTENANCE">Maintenance</option>
+              </select>
+            </div>
+          </div>
+          <table><thead><tr><th>Registration</th><th>Type</th><th>Status</th><th>Organization</th><th>Location</th><th>Actions</th></tr></thead>
+          <tbody id="amb-table"><tr class="loading-row"><td colspan="6"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
+        </div>
+      `;
+
+      let allOrgs = [];
+      try { allOrgs = await apiFetch('/organizations') || []; } catch(e) {}
+
+      async function loadAmbulances() {
+        const status = document.getElementById('ambStatusFilter').value;
+        const qs = status ? `?status=${status}` : '';
+        try {
+          const data = await apiFetch(`/ambulances${qs}`);
+          const tbody = document.getElementById('amb-table');
+          if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No ambulances found</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.map(a => `<tr>
+            <td>${a.registrationNumber || '—'}</td>
+            <td>${a.type}</td>
+            <td>${statusBadge(a.status)}</td>
+            <td>${a.organization ? a.organization.name : '—'}</td>
+            <td>${fmtGps(a.currentLat, a.currentLng)}</td>
+            <td>
+              <button class="btn-icon" onclick="editAmbulance('${a.id}')" title="Edit">&#9998;</button>
+              <button class="btn-icon" onclick="deleteAmbulance('${a.id}')" title="Delete">&#10006;</button>
+            </td>
+          </tr>`).join('');
+        } catch (e) {
+          toast('Failed to load ambulances', 'error');
+        }
+      }
+
+      document.getElementById('ambStatusFilter').addEventListener('change', loadAmbulances);
+      document.getElementById('addAmbBtn').addEventListener('click', () => showAmbModal());
+      loadAmbulances();
+
+      // Modal for add/edit
+      window.showAmbModal = async function(id) {
+        let amb = null;
+        if (id) {
+          try { amb = await apiFetch(`/ambulances/${id}`); } catch(e) { return toast('Ambulance not found', 'error'); }
+        }
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.id = 'ambModal';
+        overlay.innerHTML = `
+          <div class="modal">
+            <h2>${amb ? 'Edit' : 'Add'} Ambulance</h2>
+            <form id="ambForm">
+              <div class="form-group">
+                <label>Registration Number</label>
+                <input name="registrationNumber" placeholder="KHI-AMB-006" value="${amb?.registrationNumber || ''}" required />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Type</label>
+                  <select name="type">
+                    <option value="BASIC" ${amb?.type === 'BASIC' ? 'selected' : ''}>Basic</option>
+                    <option value="WITH_DOCTOR" ${amb?.type === 'WITH_DOCTOR' ? 'selected' : ''}>With Doctor</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Status</label>
+                  <select name="status">
+                    <option value="AVAILABLE" ${amb?.status === 'AVAILABLE' ? 'selected' : ''}>Available</option>
+                    <option value="BUSY" ${amb?.status === 'BUSY' ? 'selected' : ''}>Busy</option>
+                    <option value="OFFLINE" ${amb?.status === 'OFFLINE' ? 'selected' : ''}>Offline</option>
+                    <option value="MAINTENANCE" ${amb?.status === 'MAINTENANCE' ? 'selected' : ''}>Maintenance</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Organization</label>
+                <select name="organizationId" required>
+                  <option value="">Select Organization</option>
+                  ${allOrgs.map(o => `<option value="${o.id}" ${amb?.organizationId === o.id ? 'selected' : ''}>${o.name}</option>`).join('')}
+                </select>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Latitude</label>
+                  <input name="currentLat" type="number" step="any" placeholder="24.8607" value="${amb?.currentLat || ''}" />
+                </div>
+                <div class="form-group">
+                  <label>Longitude</label>
+                  <input name="currentLng" type="number" step="any" placeholder="67.0011" value="${amb?.currentLng || ''}" />
+                </div>
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="document.getElementById('ambModal').remove()">Cancel</button>
+                <button type="submit" class="btn btn-primary">${amb ? 'Update' : 'Create'}</button>
+              </div>
+            </form>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+        document.getElementById('ambForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const fd = new FormData(e.target);
+          const body = {};
+          body.registrationNumber = fd.get('registrationNumber');
+          body.type = fd.get('type');
+          body.status = fd.get('status');
+          body.organizationId = fd.get('organizationId');
+          if (fd.get('currentLat')) body.currentLat = parseFloat(fd.get('currentLat'));
+          if (fd.get('currentLng')) body.currentLng = parseFloat(fd.get('currentLng'));
+
+          try {
+            if (amb) {
+              await apiFetch(`/ambulances/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
+              toast('Ambulance updated');
+            } else {
+              await apiFetch('/ambulances', { method: 'POST', body: JSON.stringify(body) });
+              toast('Ambulance created');
+            }
+            overlay.remove();
+            loadAmbulances();
+          } catch (err) {
+            toast(err.message, 'error');
+          }
+        });
+      };
+
+      window.editAmbulance = (id) => showAmbModal(id);
+
+      window.deleteAmbulance = async (id) => {
+        if (!confirm('Delete this ambulance?')) return;
+        try {
+          await apiFetch(`/ambulances/${id}`, { method: 'DELETE' });
+          toast('Ambulance deleted');
+          loadAmbulances();
+        } catch (e) { toast(e.message, 'error'); }
+      };
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // PAGE: Paramedic Profiles (Full CRUD)
+    // ═══════════════════════════════════════════════════════════════
+    pages.paramedics = async () => {
+      const main = document.getElementById('mainContent');
+      main.innerHTML = `
+        <div class="page-header">
+          <div><h1>Paramedic Profiles</h1><p>Manage paramedic registrations & verifications</p></div>
+          <button class="btn btn-primary" id="addParaBtn">+ Add Profile</button>
+        </div>
+        <div class="table-section">
+          <div class="table-header">
+            <h3>All Profiles</h3>
+            <div class="filters">
+              <select class="filter-select" id="paraStatusFilter">
+                <option value="">All Statuses</option>
+                <option value="PENDING">Pending</option>
+                <option value="VERIFIED">Verified</option>
+                <option value="REJECTED">Rejected</option>
+              </select>
+            </div>
+          </div>
+          <table><thead><tr><th>Name</th><th>Email</th><th>Experience</th><th>Status</th><th>Verified At</th><th>Actions</th></tr></thead>
+          <tbody id="para-table"><tr class="loading-row"><td colspan="6"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
+        </div>
+      `;
+
+      async function loadParamedics() {
+        const status = document.getElementById('paraStatusFilter').value;
+        const qs = status ? `?status=${status}` : '';
+        try {
+          const data = await apiFetch(`/paramedic-profiles${qs}`);
+          const tbody = document.getElementById('para-table');
+          if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No paramedic profiles found</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.map(p => `<tr>
+            <td>${p.user ? p.user.name : '—'}</td>
+            <td>${p.user ? p.user.email || '—' : '—'}</td>
+            <td>${p.experienceYears != null ? p.experienceYears + ' yrs' : '—'}</td>
+            <td>${statusBadge(p.status)}</td>
+            <td>${fmtDate(p.verifiedAt)}</td>
+            <td>
+              ${p.status === 'PENDING' ? `<button class="btn btn-sm btn-success" onclick="verifyParamedic('${p.id}')">Verify</button>
+              <button class="btn btn-sm btn-danger" onclick="rejectParamedic('${p.id}')">Reject</button>` : ''}
+              <button class="btn-icon" onclick="deleteParamedic('${p.id}')" title="Delete">&#10006;</button>
+            </td>
+          </tr>`).join('');
+        } catch (e) { toast('Failed to load profiles', 'error'); }
+      }
+
+      document.getElementById('paraStatusFilter').addEventListener('change', loadParamedics);
+      document.getElementById('addParaBtn').addEventListener('click', () => showParaModal());
+      loadParamedics();
+
+      window.showParaModal = async function() {
+        let users = [];
+        try { users = await apiFetch('/users') || []; } catch(e) {}
+        const paramedicUsers = users.filter(u => u.role === 'PARAMEDIC');
+
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.id = 'paraModal';
+        overlay.innerHTML = `
+          <div class="modal">
+            <h2>Create Paramedic Profile</h2>
+            <form id="paraForm">
+              <div class="form-group">
+                <label>Paramedic User</label>
+                <select name="userId" required>
+                  <option value="">Select User (PARAMEDIC role)</option>
+                  ${paramedicUsers.map(u => `<option value="${u.id}">${u.name} (${u.email || u.phone})</option>`).join('')}
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Experience (years)</label>
+                <input name="experienceYears" type="number" min="0" placeholder="3" />
+              </div>
+              <div class="form-group">
+                <label>Notes</label>
+                <textarea name="notes" rows="3" placeholder="Additional notes..."></textarea>
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="document.getElementById('paraModal').remove()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+              </div>
+            </form>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+        document.getElementById('paraForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const fd = new FormData(e.target);
+          const body = { userId: fd.get('userId') };
+          if (fd.get('experienceYears')) body.experienceYears = parseInt(fd.get('experienceYears'));
+          if (fd.get('notes')) body.notes = fd.get('notes');
+          try {
+            await apiFetch('/paramedic-profiles', { method: 'POST', body: JSON.stringify(body) });
+            toast('Profile created');
+            overlay.remove();
+            loadParamedics();
+          } catch (err) { toast(err.message, 'error'); }
+        });
+      };
+
+      window.verifyParamedic = async (id) => {
+        try {
+          await apiFetch(`/paramedic-profiles/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'VERIFIED' }) });
+          toast('Paramedic verified');
+          loadParamedics();
+        } catch (e) { toast(e.message, 'error'); }
+      };
+
+      window.rejectParamedic = async (id) => {
+        if (!confirm('Reject this paramedic profile?')) return;
+        try {
+          await apiFetch(`/paramedic-profiles/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'REJECTED' }) });
+          toast('Profile rejected');
+          loadParamedics();
+        } catch (e) { toast(e.message, 'error'); }
+      };
+
+      window.deleteParamedic = async (id) => {
+        if (!confirm('Delete this profile?')) return;
+        try {
+          await apiFetch(`/paramedic-profiles/${id}`, { method: 'DELETE' });
+          toast('Profile deleted');
+          loadParamedics();
+        } catch (e) { toast(e.message, 'error'); }
+      };
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // PAGE: Ride Requests
+    // ═══════════════════════════════════════════════════════════════
+    pages.rides = async () => {
+      const main = document.getElementById('mainContent');
+      main.innerHTML = `
+        <div class="page-header">
+          <div><h1>Ride Requests</h1><p>Monitor incoming emergency requests</p></div>
+        </div>
+        <div class="table-section">
+          <div class="table-header">
+            <h3>All Ride Requests</h3>
+            <div class="filters">
+              <select class="filter-select" id="rideStatusFilter">
+                <option value="">All Statuses</option>
+                <option value="CREATED">Created</option>
+                <option value="DISPATCHING">Dispatching</option>
+                <option value="WAITING_DRIVER_ACCEPT">Waiting Driver</option>
+                <option value="DRIVER_ACCEPTED">Driver Accepted</option>
+                <option value="DRIVER_ARRIVED">Driver Arrived</option>
+                <option value="IN_TRIP">In Trip</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+                <option value="FAILED_NO_DRIVER">Failed</option>
+              </select>
+            </div>
+          </div>
+          <table><thead><tr><th>Requested By</th><th>Type</th><th>Status</th><th>Driver</th><th>Ambulance</th><th>ETA</th><th>Pickup</th><th>Requested At</th><th>Actions</th></tr></thead>
+          <tbody id="rides-table"><tr class="loading-row"><td colspan="9"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
+        </div>
+      `;
+
+      async function loadRides() {
+        const status = document.getElementById('rideStatusFilter').value;
+        const qs = status ? `?status=${status}` : '';
+        try {
+          const data = await apiFetch(`/ride-requests${qs}`);
+          const tbody = document.getElementById('rides-table');
+          if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No ride requests found</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.map(r => `<tr>
+            <td>${r.user ? r.user.name : '—'}</td>
+            <td>${r.ambulanceType}</td>
+            <td>${statusBadge(r.status)}</td>
+            <td>${r.assignedDriver ? r.assignedDriver.name : '—'}</td>
+            <td>${r.ambulance ? r.ambulance.registrationNumber || r.ambulance.type : '—'}</td>
+            <td>${r.etaMinutes ? r.etaMinutes + ' min' : '—'}</td>
+            <td>${fmtGps(r.pickupLat, r.pickupLng)}</td>
+            <td>${fmtDate(r.requestedAt)}</td>
+            <td>
+              <button class="btn-icon" onclick="viewRide('${r.id}')" title="View">&#128065;</button>
+              ${['CREATED','DISPATCHING','WAITING_DRIVER_ACCEPT'].includes(r.status) ?
+                `<button class="btn btn-sm btn-danger" onclick="cancelRide('${r.id}')">Cancel</button>` : ''}
+              ${r.status === 'CREATED' ?
+                `<button class="btn btn-sm btn-info" onclick="dispatchRide('${r.id}', '${r.ambulanceType}')">Dispatch</button>` : ''}
+            </td>
+          </tr>`).join('');
+        } catch (e) { toast('Failed to load rides', 'error'); }
+      }
+
+      document.getElementById('rideStatusFilter').addEventListener('change', loadRides);
+      loadRides();
+
+      window.viewRide = async (id) => {
+        try {
+          const r = await apiFetch(`/ride-requests/${id}`);
+          const overlay = document.createElement('div');
+          overlay.className = 'modal-overlay';
+          overlay.id = 'rideModal';
+          overlay.innerHTML = `
+            <div class="modal" style="max-width: 600px;">
+              <h2>Ride Request Details</h2>
+              <div class="detail-grid">
+                <div class="detail-card">
+                  <h4>Request Info</h4>
+                  <div class="detail-row"><span class="label">Status</span>${statusBadge(r.status)}</div>
+                  <div class="detail-row"><span class="label">Type</span><span>${r.ambulanceType}</span></div>
+                  <div class="detail-row"><span class="label">Patient</span><span>${r.user ? r.user.name : '—'}</span></div>
+                  <div class="detail-row"><span class="label">Phone</span><span>${r.user?.phone || '—'}</span></div>
+                  <div class="detail-row"><span class="label">ETA</span><span>${r.etaMinutes ? r.etaMinutes + ' min' : '—'}</span></div>
+                  <div class="detail-row"><span class="label">Payment</span><span>${r.paymentMethod} (${r.paymentStatus})</span></div>
+                </div>
+                <div class="detail-card">
+                  <h4>Assignment</h4>
+                  <div class="detail-row"><span class="label">Driver</span><span>${r.assignedDriver ? r.assignedDriver.name : '—'}</span></div>
+                  <div class="detail-row"><span class="label">Paramedic</span><span>${r.assignedParamedic ? r.assignedParamedic.name : '—'}</span></div>
+                  <div class="detail-row"><span class="label">Ambulance</span><span>${r.ambulance ? r.ambulance.registrationNumber : '—'}</span></div>
+                  <div class="detail-row"><span class="label">Hospital</span><span>${r.hospital ? r.hospital.name : '—'}</span></div>
+                </div>
+              </div>
+              <div class="detail-card">
+                <h4>Location</h4>
+                <div class="detail-row"><span class="label">Pickup</span><span>${fmtGps(r.pickupLat, r.pickupLng)}</span></div>
+                <div class="detail-row"><span class="label">Destination</span><span>${fmtGps(r.destinationLat, r.destinationLng)}</span></div>
+                <div class="detail-row"><span class="label">Requested</span><span>${fmtDate(r.requestedAt)}</span></div>
+                <div class="detail-row"><span class="label">Completed</span><span>${fmtDate(r.completedAt)}</span></div>
+              </div>
+              <div class="modal-actions">
+                <button class="btn btn-outline" onclick="document.getElementById('rideModal').remove()">Close</button>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(overlay);
+          overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        } catch (e) { toast(e.message, 'error'); }
+      };
+
+      window.cancelRide = async (id) => {
+        if (!confirm('Cancel this ride request?')) return;
+        try {
+          await apiFetch(`/ride-requests/${id}/cancel`, { method: 'PATCH' });
+          toast('Ride cancelled');
+          loadRides();
+        } catch (e) { toast(e.message, 'error'); }
+      };
+
+      window.dispatchRide = async (id, type) => {
+        try {
+          const result = await apiFetch('/dispatch', {
+            method: 'POST',
+            body: JSON.stringify({ rideRequestId: id, ambulanceType: type }),
+          });
+          if (result.success) {
+            toast(`Dispatched! Ambulance ${result.ambulance.registrationNumber} — ETA ${result.ambulance.etaMinutes} min`);
+          } else {
+            toast(result.message, 'error');
+          }
+          loadRides();
+        } catch (e) { toast(e.message, 'error'); }
+      };
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // PAGE: Live Tracking
+    // ═══════════════════════════════════════════════════════════════
+    pages.tracking = async () => {
+      const main = document.getElementById('mainContent');
+      main.innerHTML = `
+        <div class="page-header">
+          <div><h1>Live Tracking</h1><p>Track active ambulances and route data</p></div>
+          <button class="btn btn-primary" id="refreshTracking">&#8635; Refresh</button>
+        </div>
+        <div class="stats-grid" id="tracking-stats"></div>
+        <div class="table-section">
+          <div class="table-header"><h3>Ambulance Locations</h3></div>
+          <table><thead><tr><th>Registration</th><th>Type</th><th>Status</th><th>Latitude</th><th>Longitude</th><th>Actions</th></tr></thead>
+          <tbody id="tracking-table"><tr class="loading-row"><td colspan="6"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
+        </div>
+        <div class="table-section hidden" id="history-section">
+          <div class="table-header"><h3 id="history-title">Tracking History</h3></div>
+          <table><thead><tr><th>Latitude</th><th>Longitude</th><th>Recorded At</th></tr></thead>
+          <tbody id="history-table"></tbody></table>
+        </div>
+      `;
+
+      async function loadTracking() {
+        try {
+          const data = await apiFetch('/tracking/live');
+          const stats = document.getElementById('tracking-stats');
+          const total = data.length;
+          const avail = data.filter(a => a.status === 'AVAILABLE').length;
+          const busy = data.filter(a => a.status === 'BUSY').length;
+
+          stats.innerHTML = `
+            <div class="stat-card"><div class="label">Tracked Ambulances</div><div class="value">${total}</div><div class="sub">With GPS location</div></div>
+            <div class="stat-card"><div class="label"><span class="ambulance-dot dot-available"></span> Available</div><div class="value">${avail}</div></div>
+            <div class="stat-card"><div class="label"><span class="ambulance-dot dot-busy"></span> Busy</div><div class="value">${busy}</div></div>
+            <div class="stat-card"><div class="label"><span class="ambulance-dot dot-offline"></span> Other</div><div class="value">${total - avail - busy}</div></div>
+          `;
+
+          const tbody = document.getElementById('tracking-table');
+          if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No ambulances with GPS data</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.map(a => `<tr>
+            <td>${a.registrationNumber || '—'}</td>
+            <td>${a.type}</td>
+            <td>${statusBadge(a.status)}</td>
+            <td>${Number(a.currentLat).toFixed(6)}</td>
+            <td>${Number(a.currentLng).toFixed(6)}</td>
+            <td><button class="btn btn-sm btn-outline" onclick="viewHistory('${a.id}', '${a.registrationNumber || a.id}')">History</button></td>
+          </tr>`).join('');
+        } catch (e) { toast('Failed to load tracking', 'error'); }
+      }
+
+      document.getElementById('refreshTracking').addEventListener('click', loadTracking);
+      loadTracking();
+
+      window.viewHistory = async (ambId, name) => {
+        try {
+          const data = await apiFetch(`/tracking/${ambId}/history`);
+          const section = document.getElementById('history-section');
+          section.classList.remove('hidden');
+          document.getElementById('history-title').textContent = `Tracking History — ${name}`;
+          const tbody = document.getElementById('history-table');
+          if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No tracking history</td></tr>';
+          } else {
+            tbody.innerHTML = data.map(t => `<tr>
+              <td>${Number(t.lat).toFixed(6)}</td>
+              <td>${Number(t.lng).toFixed(6)}</td>
+              <td>${fmtDate(t.recordedAt)}</td>
+            </tr>`).join('');
+          }
+          section.scrollIntoView({ behavior: 'smooth' });
+        } catch (e) { toast(e.message, 'error'); }
+      };
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // PAGE: Dispatch
+    // ═══════════════════════════════════════════════════════════════
+    pages.dispatch = async () => {
+      const main = document.getElementById('mainContent');
+      main.innerHTML = `
+        <div class="page-header">
+          <div><h1>Dispatch</h1><p>Dispatch ambulances to emergency requests</p></div>
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-card">
+            <h4>Auto Dispatch</h4>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Select a pending ride request to auto-dispatch the nearest ambulance.</p>
+            <div class="form-group">
+              <label>Pending Ride Request</label>
+              <select class="filter-select" id="dispatchRideSelect" style="width:100%;">
+                <option value="">Loading pending rides...</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Radius (km)</label>
+                <input type="number" id="dispatchRadius" value="10" min="1" max="50" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" />
+              </div>
+              <div class="form-group" style="display:flex; align-items:flex-end;">
+                <button class="btn btn-primary" id="dispatchBtn" style="width:100%;">Dispatch Now</button>
+              </div>
+            </div>
+            <div id="dispatchResult" style="margin-top:12px;"></div>
+          </div>
+
+          <div class="detail-card">
+            <h4>Find Nearest Ambulances</h4>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px;">Search for available ambulances near a location.</p>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Latitude</label>
+                <input type="number" step="any" id="nearLat" placeholder="24.8607" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" />
+              </div>
+              <div class="form-group">
+                <label>Longitude</label>
+                <input type="number" step="any" id="nearLng" placeholder="67.0011" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" />
+              </div>
+            </div>
+            <button class="btn btn-info" id="findNearestBtn" style="width:100%;">Find Nearest</button>
+            <div id="nearestResult" style="margin-top:12px;"></div>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <h4>Distance Calculator (Haversine)</h4>
+          <div class="form-row">
+            <div class="form-group"><label>Point A — Lat</label><input type="number" step="any" id="dLat1" placeholder="24.8607" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" /></div>
+            <div class="form-group"><label>Point A — Lng</label><input type="number" step="any" id="dLng1" placeholder="67.0011" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" /></div>
+            <div class="form-group"><label>Point B — Lat</label><input type="number" step="any" id="dLat2" placeholder="24.9200" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" /></div>
+            <div class="form-group"><label>Point B — Lng</label><input type="number" step="any" id="dLng2" placeholder="67.0500" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" /></div>
+          </div>
+          <button class="btn btn-outline" id="calcDistBtn" style="margin-top:8px;">Calculate Distance</button>
+          <div id="distResult" style="margin-top:12px;"></div>
+        </div>
+      `;
+
+      // Load pending rides
+      try {
+        const rides = await apiFetch('/ride-requests?status=CREATED');
+        const sel = document.getElementById('dispatchRideSelect');
+        if (!rides || rides.length === 0) {
+          sel.innerHTML = '<option value="">No pending rides available</option>';
+        } else {
+          sel.innerHTML = '<option value="">Select a ride...</option>' +
+            rides.map(r => `<option value="${r.id}" data-type="${r.ambulanceType}">${r.user?.name || 'Unknown'} — ${r.ambulanceType} — ${fmtGps(r.pickupLat, r.pickupLng)}</option>`).join('');
+        }
+      } catch(e) {}
+
+      // Auto dispatch
+      document.getElementById('dispatchBtn').addEventListener('click', async () => {
+        const sel = document.getElementById('dispatchRideSelect');
+        const rideId = sel.value;
+        if (!rideId) return toast('Select a ride first', 'error');
+        const opt = sel.options[sel.selectedIndex];
+        const type = opt.dataset.type;
+        const radius = parseFloat(document.getElementById('dispatchRadius').value) || 10;
+        const resultDiv = document.getElementById('dispatchResult');
+        resultDiv.innerHTML = '<span class="spinner-inline"></span> Dispatching...';
+        try {
+          const r = await apiFetch('/dispatch', {
+            method: 'POST',
+            body: JSON.stringify({ rideRequestId: rideId, ambulanceType: type, radiusKm: radius }),
+          });
+          if (r.success) {
+            resultDiv.innerHTML = `<div style="padding:12px;background:rgba(34,197,94,0.15);border-radius:8px;color:var(--success);">
+              Dispatched! Ambulance: <strong>${r.ambulance.registrationNumber}</strong> — Distance: ${r.ambulance.distanceKm} km — ETA: ${r.ambulance.etaMinutes} min</div>`;
+            toast('Ambulance dispatched successfully');
+          } else {
+            resultDiv.innerHTML = `<div style="padding:12px;background:rgba(239,68,68,0.15);border-radius:8px;color:var(--error);">${r.message}</div>`;
+          }
+        } catch (e) {
+          resultDiv.innerHTML = `<div style="padding:12px;background:rgba(239,68,68,0.15);border-radius:8px;color:var(--error);">${e.message}</div>`;
+        }
+      });
+
+      // Find nearest
+      document.getElementById('findNearestBtn').addEventListener('click', async () => {
+        const lat = document.getElementById('nearLat').value;
+        const lng = document.getElementById('nearLng').value;
+        if (!lat || !lng) return toast('Enter coordinates', 'error');
+        const resultDiv = document.getElementById('nearestResult');
+        resultDiv.innerHTML = '<span class="spinner-inline"></span> Searching...';
+        try {
+          const data = await apiFetch(`/dispatch/nearest?lat=${lat}&lng=${lng}`);
+          if (data.length === 0) {
+            resultDiv.innerHTML = '<div style="padding:12px;color:var(--text-muted);">No ambulances found nearby.</div>';
+          } else {
+            resultDiv.innerHTML = `<table style="width:100%;margin-top:8px;"><thead><tr><th>Registration</th><th>Type</th><th>Distance</th></tr></thead><tbody>
+              ${data.map(a => `<tr><td style="padding:6px 8px;">${a.registrationNumber || '—'}</td><td style="padding:6px 8px;">${a.type}</td><td style="padding:6px 8px;">${a.distanceKm.toFixed(2)} km</td></tr>`).join('')}
+            </tbody></table>`;
+          }
+        } catch (e) { resultDiv.innerHTML = `<div style="color:var(--error);">${e.message}</div>`; }
+      });
+
+      // Distance calculator
+      document.getElementById('calcDistBtn').addEventListener('click', async () => {
+        const lat1 = document.getElementById('dLat1').value;
+        const lng1 = document.getElementById('dLng1').value;
+        const lat2 = document.getElementById('dLat2').value;
+        const lng2 = document.getElementById('dLng2').value;
+        if (!lat1 || !lng1 || !lat2 || !lng2) return toast('Fill all coordinates', 'error');
+        try {
+          const r = await apiFetch(`/dispatch/distance?lat1=${lat1}&lng1=${lng1}&lat2=${lat2}&lng2=${lng2}`);
+          document.getElementById('distResult').innerHTML = `
+            <div style="padding:12px;background:rgba(59,130,246,0.15);border-radius:8px;color:var(--info);">
+              Distance: <strong>${r.distanceKm} km</strong> (${r.distanceMeters} meters)</div>`;
+        } catch (e) { document.getElementById('distResult').innerHTML = `<div style="color:var(--error);">${e.message}</div>`; }
+      });
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // PAGE: Driver Performance
+    // ═══════════════════════════════════════════════════════════════
+    pages.performance = async () => {
+      const main = document.getElementById('mainContent');
+      main.innerHTML = `
+        <div class="page-header">
+          <div><h1>Driver Performance</h1><p>Monitor driver performance and reassign ambulances</p></div>
+        </div>
+        <div class="table-section">
+          <div class="table-header">
+            <h3>Performance Metrics</h3>
+            <div class="filters">
+              <select class="filter-select" id="perfSort">
+                <option value="rating">Sort by Rating</option>
+                <option value="totalRides">Sort by Total Rides</option>
+                <option value="averageResponseTime">Sort by Response Time</option>
+              </select>
+            </div>
+          </div>
+          <table><thead><tr><th>Driver</th><th>Email</th><th>Total Rides</th><th>Avg Response Time</th><th>Rating</th><th>Last Active</th><th>Actions</th></tr></thead>
+          <tbody id="perf-table"><tr class="loading-row"><td colspan="7"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
+        </div>
+      `;
+
+      async function loadPerf() {
+        const sort = document.getElementById('perfSort').value;
+        try {
+          const data = await apiFetch(`/driver-performance?orderBy=${sort}`);
+          const tbody = document.getElementById('perf-table');
+          if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No performance data</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.map(p => {
+            const stars = p.rating ? '&#9733;'.repeat(Math.round(p.rating)) + ` (${p.rating})` : '—';
+            return `<tr>
+              <td>${p.driver ? p.driver.name : '—'}</td>
+              <td>${p.driver ? p.driver.email || '—' : '—'}</td>
+              <td>${p.totalRides}</td>
+              <td>${p.averageResponseTime ? p.averageResponseTime + ' min' : '—'}</td>
+              <td style="color: ${p.rating >= 4 ? 'var(--success)' : p.rating >= 3 ? 'var(--warning)' : 'var(--error)'};">${stars}</td>
+              <td>${fmtDate(p.lastActive)}</td>
+              <td><button class="btn btn-sm btn-outline" onclick="editPerf('${p.driverId}', '${p.driver?.name || ''}')">Edit</button></td>
+            </tr>`;
+          }).join('');
+        } catch (e) { toast('Failed to load performance', 'error'); }
+      }
+
+      document.getElementById('perfSort').addEventListener('change', loadPerf);
+      loadPerf();
+
+      window.editPerf = async (driverId, name) => {
+        let perf;
+        try { perf = await apiFetch(`/driver-performance/${driverId}`); } catch(e) { return toast(e.message, 'error'); }
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.id = 'perfModal';
+        overlay.innerHTML = `
+          <div class="modal">
+            <h2>Edit Performance — ${name}</h2>
+            <form id="perfForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Total Rides</label>
+                  <input name="totalRides" type="number" min="0" value="${perf.totalRides || 0}" />
+                </div>
+                <div class="form-group">
+                  <label>Rating (0-5)</label>
+                  <input name="rating" type="number" step="0.1" min="0" max="5" value="${perf.rating || ''}" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Avg Response Time (minutes)</label>
+                <input name="averageResponseTime" type="number" step="0.1" min="0" value="${perf.averageResponseTime || ''}" />
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="document.getElementById('perfModal').remove()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update</button>
+              </div>
+            </form>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+        document.getElementById('perfForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const fd = new FormData(e.target);
+          const body = {};
+          if (fd.get('totalRides')) body.totalRides = parseInt(fd.get('totalRides'));
+          if (fd.get('rating')) body.rating = parseFloat(fd.get('rating'));
+          if (fd.get('averageResponseTime')) body.averageResponseTime = parseFloat(fd.get('averageResponseTime'));
+          try {
+            await apiFetch(`/driver-performance/${driverId}`, { method: 'PATCH', body: JSON.stringify(body) });
+            toast('Performance updated');
+            overlay.remove();
+            loadPerf();
+          } catch (err) { toast(err.message, 'error'); }
+        });
+      };
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // INIT: Load default page
+    // ═══════════════════════════════════════════════════════════════
+    navigate('dashboard');
   </script>
 </body>
 </html>
