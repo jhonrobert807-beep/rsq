@@ -357,7 +357,10 @@
       <button class="nav-item active" data-page="dashboard"><span class="nav-icon">&#9632;</span> Dashboard</button>
 
       <div class="nav-section">Management</div>
+      <button class="nav-item" data-page="users"><span class="nav-icon">&#9823;</span> Users</button>
       <button class="nav-item" data-page="ambulances"><span class="nav-icon">&#9670;</span> Ambulances</button>
+      <button class="nav-item" data-page="organizations"><span class="nav-icon">&#9960;</span> Organizations</button>
+      <button class="nav-item" data-page="hospitals"><span class="nav-icon">&#9971;</span> Hospitals</button>
       <button class="nav-item" data-page="paramedics"><span class="nav-icon">&#9998;</span> Paramedic Profiles</button>
 
       <div class="nav-section">Operations</div>
@@ -367,6 +370,7 @@
 
       <div class="nav-section">Monitoring</div>
       <button class="nav-item" data-page="performance"><span class="nav-icon">&#9776;</span> Driver Performance</button>
+      <button class="nav-item" data-page="auditlog"><span class="nav-icon">&#9881;</span> Audit Log</button>
     </nav>
 
     <div class="sidebar-footer">
@@ -909,6 +913,8 @@
                 `<button class="btn btn-sm btn-danger" onclick="cancelRide('${r.id}')">Cancel</button>` : ''}
               ${r.status === 'CREATED' ?
                 `<button class="btn btn-sm btn-info" onclick="dispatchRide('${r.id}', '${r.ambulanceType}')">Dispatch</button>` : ''}
+              ${['WAITING_DRIVER_ACCEPT','DRIVER_ACCEPTED','DISPATCHING'].includes(r.status) ?
+                `<button class="btn btn-sm btn-warning" onclick="reassignRide('${r.id}')">Reassign</button>` : ''}
             </td>
           </tr>`).join('');
         } catch (e) { toast('Failed to load rides', 'error'); }
@@ -982,6 +988,53 @@
             toast(result.message, 'error');
           }
           loadRides();
+        } catch (e) { toast(e.message, 'error'); }
+      };
+
+      window.reassignRide = async (rideId) => {
+        try {
+          const ambulances = await apiFetch('/ambulances?status=AVAILABLE');
+          if (!ambulances || ambulances.length === 0) {
+            toast('No available ambulances to reassign', 'error');
+            return;
+          }
+          const overlay = document.createElement('div');
+          overlay.className = 'modal-overlay';
+          overlay.id = 'reassignModal';
+          overlay.innerHTML = `
+            <div class="modal">
+              <h2>Reassign Ride</h2>
+              <form id="reassignForm">
+                <div class="form-group">
+                  <label>Select Available Ambulance</label>
+                  <select name="ambulanceId" required>
+                    <option value="">Choose ambulance...</option>
+                    ${ambulances.map(a => `<option value="${a.id}">${a.registrationNumber || 'N/A'} — ${a.type} (${a.organization ? a.organization.name : 'N/A'})</option>`).join('')}
+                  </select>
+                </div>
+                <div class="modal-actions">
+                  <button type="button" class="btn btn-outline" onclick="document.getElementById('reassignModal').remove()">Cancel</button>
+                  <button type="submit" class="btn btn-warning">Reassign</button>
+                </div>
+              </form>
+            </div>
+          `;
+          document.body.appendChild(overlay);
+          overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+          document.getElementById('reassignForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const ambulanceId = new FormData(e.target).get('ambulanceId');
+            try {
+              await apiFetch(`/ride-requests/${rideId}/reassign`, {
+                method: 'PATCH',
+                body: JSON.stringify({ ambulanceId }),
+              });
+              toast('Ride reassigned successfully');
+              overlay.remove();
+              loadRides();
+            } catch (err) { toast(err.message, 'error'); }
+          });
         } catch (e) { toast(e.message, 'error'); }
       };
     };
@@ -1302,6 +1355,423 @@
           } catch (err) { toast(err.message, 'error'); }
         });
       };
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // PAGE: Users (CRUD)
+    // ═══════════════════════════════════════════════════════════════
+    pages.users = async () => {
+      const main = document.getElementById('mainContent');
+      main.innerHTML = `
+        <div class="page-header">
+          <div><h1>Users</h1><p>Manage system users</p></div>
+          <button class="btn btn-primary" id="addUserBtn">+ Add User</button>
+        </div>
+        <div class="table-section">
+          <div class="table-header">
+            <h3>All Users</h3>
+            <div class="filters">
+              <select class="filter-select" id="userRoleFilter">
+                <option value="">All Roles</option>
+                <option value="USER">User</option>
+                <option value="DRIVER">Driver</option>
+                <option value="PARAMEDIC">Paramedic</option>
+                <option value="ADMIN">Admin</option>
+              </select>
+              <input type="text" class="filter-select" id="userSearchInput" placeholder="Search name/email..." style="width:180px;">
+            </div>
+          </div>
+          <table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Active</th><th>Created</th><th>Actions</th></tr></thead>
+          <tbody id="users-table"><tr class="loading-row"><td colspan="7"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
+        </div>
+      `;
+
+      async function loadUsers() {
+        const role = document.getElementById('userRoleFilter').value;
+        const search = document.getElementById('userSearchInput').value;
+        let qs = [];
+        if (role) qs.push('role=' + role);
+        if (search) qs.push('search=' + encodeURIComponent(search));
+        const query = qs.length ? '?' + qs.join('&') : '';
+        try {
+          const data = await apiFetch('/users' + query);
+          const tbody = document.getElementById('users-table');
+          if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No users found</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.map(u => `<tr>
+            <td>${u.name}</td>
+            <td>${u.email || '—'}</td>
+            <td>${u.phone || '—'}</td>
+            <td>${statusBadge(u.role)}</td>
+            <td>${u.isActive ? '<span style="color:var(--success)">Yes</span>' : '<span style="color:var(--error)">No</span>'}</td>
+            <td>${fmtDate(u.createdAt)}</td>
+            <td>
+              <button class="btn-icon" onclick="editUser('${u.id}')" title="Edit">&#9998;</button>
+              <button class="btn-icon" onclick="deleteUser('${u.id}')" title="Delete" style="color:var(--error)">&#10005;</button>
+            </td>
+          </tr>`).join('');
+        } catch (e) { toast(e.message, 'error'); }
+      }
+
+      document.getElementById('userRoleFilter').addEventListener('change', loadUsers);
+      document.getElementById('userSearchInput').addEventListener('input', (() => { let t; return () => { clearTimeout(t); t = setTimeout(loadUsers, 400); }; })());
+
+      document.getElementById('addUserBtn').addEventListener('click', () => {
+        showUserModal();
+      });
+
+      window.editUser = async (id) => {
+        try {
+          const u = await apiFetch('/users/' + id);
+          showUserModal(u);
+        } catch (e) { toast(e.message, 'error'); }
+      };
+
+      window.deleteUser = async (id) => {
+        if (!confirm('Delete this user?')) return;
+        try {
+          await apiFetch('/users/' + id, { method: 'DELETE' });
+          toast('User deleted');
+          loadUsers();
+        } catch (e) { toast(e.message, 'error'); }
+      };
+
+      function showUserModal(existing) {
+        const isEdit = !!existing;
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.id = 'userModal';
+        overlay.innerHTML = `
+          <div class="modal">
+            <h2>${isEdit ? 'Edit' : 'Add'} User</h2>
+            <form id="userForm">
+              <div class="form-group"><label>Name</label><input name="name" value="${existing?.name || ''}" required></div>
+              <div class="form-row">
+                <div class="form-group"><label>Email</label><input name="email" type="email" value="${existing?.email || ''}"></div>
+                <div class="form-group"><label>Phone</label><input name="phone" value="${existing?.phone || ''}"></div>
+              </div>
+              ${!isEdit ? '<div class="form-group"><label>Password</label><input name="password" type="password" required minlength="6"></div>' : ''}
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Role</label>
+                  <select name="role">
+                    <option value="USER" ${existing?.role === 'USER' ? 'selected' : ''}>User</option>
+                    <option value="DRIVER" ${existing?.role === 'DRIVER' ? 'selected' : ''}>Driver</option>
+                    <option value="PARAMEDIC" ${existing?.role === 'PARAMEDIC' ? 'selected' : ''}>Paramedic</option>
+                    <option value="ADMIN" ${existing?.role === 'ADMIN' ? 'selected' : ''}>Admin</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Active</label>
+                  <select name="isActive">
+                    <option value="true" ${existing?.isActive !== false ? 'selected' : ''}>Yes</option>
+                    <option value="false" ${existing?.isActive === false ? 'selected' : ''}>No</option>
+                  </select>
+                </div>
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="document.getElementById('userModal').remove()">Cancel</button>
+                <button type="submit" class="btn btn-primary">${isEdit ? 'Update' : 'Create'}</button>
+              </div>
+            </form>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const fd = new FormData(e.target);
+          const body = { name: fd.get('name'), role: fd.get('role'), isActive: fd.get('isActive') === 'true' };
+          if (fd.get('email')) body.email = fd.get('email');
+          if (fd.get('phone')) body.phone = fd.get('phone');
+          if (fd.get('password')) body.password = fd.get('password');
+          try {
+            if (isEdit) {
+              await apiFetch('/users/' + existing.id, { method: 'PATCH', body: JSON.stringify(body) });
+              toast('User updated');
+            } else {
+              await apiFetch('/users', { method: 'POST', body: JSON.stringify(body) });
+              toast('User created');
+            }
+            overlay.remove();
+            loadUsers();
+          } catch (err) { toast(err.message, 'error'); }
+        });
+      }
+
+      loadUsers();
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // PAGE: Organizations (CRUD)
+    // ═══════════════════════════════════════════════════════════════
+    pages.organizations = async () => {
+      const main = document.getElementById('mainContent');
+      main.innerHTML = `
+        <div class="page-header">
+          <div><h1>Organizations</h1><p>Manage ambulance service organizations</p></div>
+          <button class="btn btn-primary" id="addOrgBtn">+ Add Organization</button>
+        </div>
+        <div class="table-section">
+          <div class="table-header"><h3>All Organizations</h3></div>
+          <table><thead><tr><th>Name</th><th>Address</th><th>Email</th><th>Phone</th><th>Created</th><th>Actions</th></tr></thead>
+          <tbody id="orgs-table"><tr class="loading-row"><td colspan="6"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
+        </div>
+      `;
+
+      async function loadOrgs() {
+        try {
+          const data = await apiFetch('/organizations');
+          const tbody = document.getElementById('orgs-table');
+          if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No organizations found</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.map(o => `<tr>
+            <td>${o.name}</td>
+            <td>${o.address || '—'}</td>
+            <td>${o.contactEmail || '—'}</td>
+            <td>${o.contactPhone || '—'}</td>
+            <td>${fmtDate(o.createdAt)}</td>
+            <td>
+              <button class="btn-icon" onclick="editOrg('${o.id}')" title="Edit">&#9998;</button>
+              <button class="btn-icon" onclick="deleteOrg('${o.id}')" title="Delete" style="color:var(--error)">&#10005;</button>
+            </td>
+          </tr>`).join('');
+        } catch (e) { toast(e.message, 'error'); }
+      }
+
+      document.getElementById('addOrgBtn').addEventListener('click', () => showOrgModal());
+
+      window.editOrg = async (id) => {
+        try {
+          const o = await apiFetch('/organizations/' + id);
+          showOrgModal(o);
+        } catch (e) { toast(e.message, 'error'); }
+      };
+
+      window.deleteOrg = async (id) => {
+        if (!confirm('Delete this organization? All linked ambulances and hospitals will also be removed.')) return;
+        try {
+          await apiFetch('/organizations/' + id, { method: 'DELETE' });
+          toast('Organization deleted');
+          loadOrgs();
+        } catch (e) { toast(e.message, 'error'); }
+      };
+
+      function showOrgModal(existing) {
+        const isEdit = !!existing;
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.id = 'orgModal';
+        overlay.innerHTML = `
+          <div class="modal">
+            <h2>${isEdit ? 'Edit' : 'Add'} Organization</h2>
+            <form id="orgForm">
+              <div class="form-group"><label>Name</label><input name="name" value="${existing?.name || ''}" required></div>
+              <div class="form-group"><label>Address</label><input name="address" value="${existing?.address || ''}"></div>
+              <div class="form-row">
+                <div class="form-group"><label>Contact Email</label><input name="contactEmail" type="email" value="${existing?.contactEmail || ''}"></div>
+                <div class="form-group"><label>Contact Phone</label><input name="contactPhone" value="${existing?.contactPhone || ''}"></div>
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="document.getElementById('orgModal').remove()">Cancel</button>
+                <button type="submit" class="btn btn-primary">${isEdit ? 'Update' : 'Create'}</button>
+              </div>
+            </form>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+        document.getElementById('orgForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const fd = new FormData(e.target);
+          const body = { name: fd.get('name') };
+          if (fd.get('address')) body.address = fd.get('address');
+          if (fd.get('contactEmail')) body.contactEmail = fd.get('contactEmail');
+          if (fd.get('contactPhone')) body.contactPhone = fd.get('contactPhone');
+          try {
+            if (isEdit) {
+              await apiFetch('/organizations/' + existing.id, { method: 'PATCH', body: JSON.stringify(body) });
+              toast('Organization updated');
+            } else {
+              await apiFetch('/organizations', { method: 'POST', body: JSON.stringify(body) });
+              toast('Organization created');
+            }
+            overlay.remove();
+            loadOrgs();
+          } catch (err) { toast(err.message, 'error'); }
+        });
+      }
+
+      loadOrgs();
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // PAGE: Hospitals (CRUD)
+    // ═══════════════════════════════════════════════════════════════
+    pages.hospitals = async () => {
+      const main = document.getElementById('mainContent');
+      main.innerHTML = `
+        <div class="page-header">
+          <div><h1>Hospitals</h1><p>Manage hospitals linked to organizations</p></div>
+          <button class="btn btn-primary" id="addHospBtn">+ Add Hospital</button>
+        </div>
+        <div class="table-section">
+          <div class="table-header"><h3>All Hospitals</h3></div>
+          <table><thead><tr><th>Name</th><th>Address</th><th>Phone</th><th>Organization</th><th>Location</th><th>Actions</th></tr></thead>
+          <tbody id="hosp-table"><tr class="loading-row"><td colspan="6"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
+        </div>
+      `;
+
+      let allOrgs = [];
+      try { allOrgs = await apiFetch('/organizations') || []; } catch(e) {}
+
+      async function loadHospitals() {
+        try {
+          const data = await apiFetch('/hospitals');
+          const tbody = document.getElementById('hosp-table');
+          if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No hospitals found</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.map(h => `<tr>
+            <td>${h.name}</td>
+            <td>${h.address || '—'}</td>
+            <td>${h.contactPhone || '—'}</td>
+            <td>${h.organization ? h.organization.name : '—'}</td>
+            <td>${fmtGps(h.locationLat, h.locationLng)}</td>
+            <td>
+              <button class="btn-icon" onclick="editHosp('${h.id}')" title="Edit">&#9998;</button>
+              <button class="btn-icon" onclick="deleteHosp('${h.id}')" title="Delete" style="color:var(--error)">&#10005;</button>
+            </td>
+          </tr>`).join('');
+        } catch (e) { toast(e.message, 'error'); }
+      }
+
+      document.getElementById('addHospBtn').addEventListener('click', () => showHospModal());
+
+      window.editHosp = async (id) => {
+        try {
+          const h = await apiFetch('/hospitals/' + id);
+          showHospModal(h);
+        } catch (e) { toast(e.message, 'error'); }
+      };
+
+      window.deleteHosp = async (id) => {
+        if (!confirm('Delete this hospital?')) return;
+        try {
+          await apiFetch('/hospitals/' + id, { method: 'DELETE' });
+          toast('Hospital deleted');
+          loadHospitals();
+        } catch (e) { toast(e.message, 'error'); }
+      };
+
+      function showHospModal(existing) {
+        const isEdit = !!existing;
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.id = 'hospModal';
+        overlay.innerHTML = `
+          <div class="modal">
+            <h2>${isEdit ? 'Edit' : 'Add'} Hospital</h2>
+            <form id="hospForm">
+              <div class="form-group"><label>Name</label><input name="name" value="${existing?.name || ''}" required></div>
+              <div class="form-group"><label>Address</label><input name="address" value="${existing?.address || ''}"></div>
+              <div class="form-group"><label>Contact Phone</label><input name="contactPhone" value="${existing?.contactPhone || ''}"></div>
+              <div class="form-group">
+                <label>Organization</label>
+                <select name="organizationId" required>
+                  <option value="">Select Organization</option>
+                  ${allOrgs.map(o => `<option value="${o.id}" ${existing?.organizationId === o.id ? 'selected' : ''}>${o.name}</option>`).join('')}
+                </select>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>Latitude</label><input name="locationLat" type="number" step="any" value="${existing?.locationLat || ''}"></div>
+                <div class="form-group"><label>Longitude</label><input name="locationLng" type="number" step="any" value="${existing?.locationLng || ''}"></div>
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="document.getElementById('hospModal').remove()">Cancel</button>
+                <button type="submit" class="btn btn-primary">${isEdit ? 'Update' : 'Create'}</button>
+              </div>
+            </form>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+
+        document.getElementById('hospForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const fd = new FormData(e.target);
+          const body = { name: fd.get('name'), organizationId: fd.get('organizationId') };
+          if (fd.get('address')) body.address = fd.get('address');
+          if (fd.get('contactPhone')) body.contactPhone = fd.get('contactPhone');
+          if (fd.get('locationLat')) body.locationLat = parseFloat(fd.get('locationLat'));
+          if (fd.get('locationLng')) body.locationLng = parseFloat(fd.get('locationLng'));
+          try {
+            if (isEdit) {
+              await apiFetch('/hospitals/' + existing.id, { method: 'PATCH', body: JSON.stringify(body) });
+              toast('Hospital updated');
+            } else {
+              await apiFetch('/hospitals', { method: 'POST', body: JSON.stringify(body) });
+              toast('Hospital created');
+            }
+            overlay.remove();
+            loadHospitals();
+          } catch (err) { toast(err.message, 'error'); }
+        });
+      }
+
+      loadHospitals();
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    // PAGE: Audit Log
+    // ═══════════════════════════════════════════════════════════════
+    pages.auditlog = async () => {
+      const main = document.getElementById('mainContent');
+      main.innerHTML = `
+        <div class="page-header">
+          <div><h1>Audit Log</h1><p>Admin activity history</p></div>
+        </div>
+        <div class="table-section">
+          <div class="table-header">
+            <h3>Recent Actions</h3>
+            <div class="filters">
+              <input type="text" class="filter-select" id="auditSearch" placeholder="Filter by action..." style="width:200px;">
+            </div>
+          </div>
+          <table><thead><tr><th>Admin</th><th>Action</th><th>Target ID</th><th>Metadata</th><th>Date</th></tr></thead>
+          <tbody id="audit-table"><tr class="loading-row"><td colspan="5"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
+        </div>
+      `;
+
+      async function loadAudit() {
+        const action = document.getElementById('auditSearch').value;
+        const qs = action ? '?action=' + encodeURIComponent(action) : '';
+        try {
+          const data = await apiFetch('/admin-actions' + qs);
+          const tbody = document.getElementById('audit-table');
+          if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No audit entries found</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.map(a => `<tr>
+            <td>${a.admin ? a.admin.name : '—'}</td>
+            <td>${a.action}</td>
+            <td style="font-size:12px;color:var(--text-muted)">${a.targetId || '—'}</td>
+            <td style="font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${a.metadata ? JSON.stringify(a.metadata).replace(/"/g, '&quot;') : ''}">${a.metadata ? JSON.stringify(a.metadata) : '—'}</td>
+            <td>${fmtDate(a.createdAt)}</td>
+          </tr>`).join('');
+        } catch (e) { toast(e.message, 'error'); }
+      }
+
+      document.getElementById('auditSearch').addEventListener('input', (() => { let t; return () => { clearTimeout(t); t = setTimeout(loadAudit, 400); }; })());
+      loadAudit();
     };
 
     // ═══════════════════════════════════════════════════════════════

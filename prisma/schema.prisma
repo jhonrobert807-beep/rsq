@@ -208,7 +208,11 @@ model RideRequest {
   paymentStatus    PaymentStatus @default(PENDING)
   paymentMethod    PaymentMethod @default(CASH)
 
+  // User rating (1-5, set after ride is completed)
+  userRating       Float?
+
   // Routing payload
+  distanceKm       Float?
   etaMinutes       Int?
   routeData        Json?
 

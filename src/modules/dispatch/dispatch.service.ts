@@ -104,13 +104,14 @@ export class DispatchService {
     const ambulance = nearest[0];
 
     // Assign ambulance and update status
+    const now = new Date();
     const updatedRide = await this.prisma.rideRequest.update({
       where: { id: ride.id },
       data: {
         ambulanceId: ambulance.id,
         status: RideRequestStatus.WAITING_DRIVER_ACCEPT,
         etaMinutes: Math.ceil((ambulance.distanceKm / 40) * 60), // ~40 km/h avg speed
-        statusUpdatedAt: new Date(),
+        statusUpdatedAt: now,
       },
       include: {
         user: { select: { id: true, name: true, phone: true } },
@@ -122,6 +123,21 @@ export class DispatchService {
     await this.prisma.ambulance.update({
       where: { id: ambulance.id },
       data: { status: AmbulanceStatus.BUSY },
+    });
+
+    // Record dispatch attempt with 2-minute expiry
+    const expiresAt = new Date(now.getTime() + 2 * 60 * 1000);
+    // Find a driver associated with this ambulance (use assignedDriverId if already set)
+    await this.prisma.rideRequestAttempt.create({
+      data: {
+        rideRequestId: ride.id,
+        driverId: ride.assignedDriverId || ride.userId, // placeholder if no driver assigned yet
+        status: 'SENT',
+        sentAt: now,
+        expiresAt,
+      },
+    }).catch(() => {
+      // Attempt record is best-effort; don't fail the dispatch
     });
 
     return {

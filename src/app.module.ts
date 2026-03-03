@@ -17,6 +17,7 @@ import { ChatsModule } from './modules/chats/chats.module';
 import { AdminActionsModule } from './modules/admin-actions/admin-actions.module';
 import { DriverPerformanceModule } from './modules/driver-performance/driver-performance.module';
 import { ParamedicProfilesModule } from './modules/paramedic-profiles/paramedic-profiles.module';
+import { AdminStatsModule } from './modules/admin-stats/admin-stats.module';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { ParamedicProfilesModule } from './modules/paramedic-profiles/paramedic-
       rootPath: join(__dirname, '..', '..', 'admin'),
       serveRoot: '/admin',
     }),
-    ConfigModule, CommonModule, AuthModule, UsersModule, OrganizationsModule, HospitalsModule, AmbulancesModule, RideRequestsModule, DispatchModule, TrackingModule, ChatsModule, AdminActionsModule, DriverPerformanceModule, ParamedicProfilesModule],
+    ConfigModule, CommonModule, AuthModule, UsersModule, OrganizationsModule, HospitalsModule, AmbulancesModule, RideRequestsModule, DispatchModule, TrackingModule, ChatsModule, AdminActionsModule, DriverPerformanceModule, ParamedicProfilesModule, AdminStatsModule],
   controllers: [AppController],
   providers: [AppService],
 })
