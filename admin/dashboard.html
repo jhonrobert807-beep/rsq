@@ -82,7 +82,8 @@
     .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
     .nav-item.active { background: var(--primary-light); color: var(--primary); }
 
-    .nav-icon { width: 20px; text-align: center; font-size: 15px; }
+    .nav-icon { width: 20px; height: 20px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .nav-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
     .sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--card-border); }
 
@@ -354,23 +355,23 @@
 
     <nav class="sidebar-nav" id="sidebarNav">
       <div class="nav-section">Overview</div>
-      <button class="nav-item active" data-page="dashboard"><span class="nav-icon">&#9632;</span> Dashboard</button>
+      <button class="nav-item active" data-page="dashboard"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></span> Dashboard</button>
 
       <div class="nav-section">Management</div>
-      <button class="nav-item" data-page="users"><span class="nav-icon">&#9823;</span> Users</button>
-      <button class="nav-item" data-page="ambulances"><span class="nav-icon">&#9670;</span> Ambulances</button>
-      <button class="nav-item" data-page="organizations"><span class="nav-icon">&#9960;</span> Organizations</button>
-      <button class="nav-item" data-page="hospitals"><span class="nav-icon">&#9971;</span> Hospitals</button>
-      <button class="nav-item" data-page="paramedics"><span class="nav-icon">&#9998;</span> Paramedic Profiles</button>
+      <button class="nav-item" data-page="users"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Users</button>
+      <button class="nav-item" data-page="ambulances"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 15h4l3-8h4l2 8h5"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/><path d="M1 15h1m20 0h1"/><rect x="5" y="7" width="10" height="8" rx="1"/><path d="M15 7h2l3 4v4h-5"/><path d="M7 11h4"/><path d="M9 9v4"/></svg></span> Ambulances</button>
+      <button class="nav-item" data-page="organizations"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/></svg></span> Organizations</button>
+      <button class="nav-item" data-page="hospitals"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M12 7v4"/><path d="M10 9h4"/><path d="M9 21v-4h6v4"/></svg></span> Hospitals</button>
+      <button class="nav-item" data-page="paramedics"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6 6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg></span> Paramedic Profiles</button>
 
       <div class="nav-section">Operations</div>
-      <button class="nav-item" data-page="rides"><span class="nav-icon">&#10148;</span> Ride Requests</button>
-      <button class="nav-item" data-page="tracking"><span class="nav-icon">&#9737;</span> Live Tracking</button>
-      <button class="nav-item" data-page="dispatch"><span class="nav-icon">&#9993;</span> Dispatch</button>
+      <button class="nav-item" data-page="rides"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span> Ride Requests</button>
+      <button class="nav-item" data-page="tracking"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span> Live Tracking</button>
+      <button class="nav-item" data-page="dispatch"><span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></span> Dispatch</button>
 
       <div class="nav-section">Monitoring</div>
-      <button class="nav-item" data-page="performance"><span class="nav-icon">&#9776;</span> Driver Performance</button>
-      <button class="nav-item" data-page="auditlog"><span class="nav-icon">&#9881;</span> Audit Log</button>
+      <button class="nav-item" data-page="performance"><span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Driver Performance</button>
+      <button class="nav-item" data-page="auditlog"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span> Audit Log</button>
     </nav>
 
     <div class="sidebar-footer">
@@ -382,7 +383,7 @@
         </div>
       </div>
       <button class="logout-btn" id="logoutBtn">
-        <span class="nav-icon">&#10140;</span> Sign out
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span> Sign out
       </button>
     </div>
   </aside>
@@ -441,6 +442,35 @@
       el.textContent = msg;
       document.getElementById('toastContainer').appendChild(el);
       setTimeout(() => el.remove(), 4000);
+    }
+
+    // ── Themed confirm modal ───
+    function confirmModal(message) {
+      return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+          <div class="modal" style="max-width:400px; text-align:center;">
+            <div style="margin-bottom:20px;">
+              <div style="width:56px;height:56px;margin:0 auto 16px;border-radius:50%;background:rgba(239,68,68,0.15);display:flex;align-items:center;justify-content:center;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+              </div>
+              <h2 style="margin-bottom:8px;">Are you sure?</h2>
+              <p style="color:var(--text-muted);font-size:14px;line-height:1.5;margin:0;">${message}</p>
+            </div>
+            <div class="modal-actions" style="justify-content:center;">
+              <button class="btn btn-outline" id="confirmCancel">Cancel</button>
+              <button class="btn btn-danger" id="confirmOk">Confirm</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) { overlay.remove(); resolve(false); } });
+        document.getElementById('confirmCancel').addEventListener('click', () => { overlay.remove(); resolve(false); });
+        document.getElementById('confirmOk').addEventListener('click', () => { overlay.remove(); resolve(true); });
+      });
     }
 
     // ── Status badge helper ───
@@ -607,8 +637,8 @@
             <td>${a.organization ? a.organization.name : '—'}</td>
             <td>${fmtGps(a.currentLat, a.currentLng)}</td>
             <td>
-              <button class="btn-icon" onclick="editAmbulance('${a.id}')" title="Edit">&#9998;</button>
-              <button class="btn-icon" onclick="deleteAmbulance('${a.id}')" title="Delete">&#10006;</button>
+              <button class="btn-icon" data-edit-amb="${a.id}" title="Edit">&#9998;</button>
+              <button class="btn-icon" data-delete-amb="${a.id}" title="Delete">&#10006;</button>
             </td>
           </tr>`).join('');
         } catch (e) {
@@ -618,10 +648,18 @@
 
       document.getElementById('ambStatusFilter').addEventListener('change', loadAmbulances);
       document.getElementById('addAmbBtn').addEventListener('click', () => showAmbModal());
+
+      document.getElementById('amb-table').addEventListener('click', (e) => {
+        const editBtn = e.target.closest('[data-edit-amb]');
+        const deleteBtn = e.target.closest('[data-delete-amb]');
+        if (editBtn) showAmbModal(editBtn.dataset.editAmb);
+        if (deleteBtn) deleteAmbulance(deleteBtn.dataset.deleteAmb);
+      });
+
       loadAmbulances();
 
       // Modal for add/edit
-      window.showAmbModal = async function(id) {
+      async function showAmbModal(id) {
         let amb = null;
         if (id) {
           try { amb = await apiFetch(`/ambulances/${id}`); } catch(e) { return toast('Ambulance not found', 'error'); }
@@ -673,7 +711,7 @@
                 </div>
               </div>
               <div class="modal-actions">
-                <button type="button" class="btn btn-outline" onclick="document.getElementById('ambModal').remove()">Cancel</button>
+                <button type="button" class="btn btn-outline" id="ambModalCancel">Cancel</button>
                 <button type="submit" class="btn btn-primary">${amb ? 'Update' : 'Create'}</button>
               </div>
             </form>
@@ -681,6 +719,7 @@
         `;
         document.body.appendChild(overlay);
         overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        document.getElementById('ambModalCancel').addEventListener('click', () => overlay.remove());
 
         document.getElementById('ambForm').addEventListener('submit', async (e) => {
           e.preventDefault();
@@ -707,18 +746,16 @@
             toast(err.message, 'error');
           }
         });
-      };
+      }
 
-      window.editAmbulance = (id) => showAmbModal(id);
-
-      window.deleteAmbulance = async (id) => {
-        if (!confirm('Delete this ambulance?')) return;
+      async function deleteAmbulance(id) {
+        if (!(await confirmModal('Delete this ambulance?'))) return;
         try {
           await apiFetch(`/ambulances/${id}`, { method: 'DELETE' });
           toast('Ambulance deleted');
           loadAmbulances();
         } catch (e) { toast(e.message, 'error'); }
-      };
+      }
     };
 
     // ═══════════════════════════════════════════════════════════════
@@ -765,9 +802,9 @@
             <td>${statusBadge(p.status)}</td>
             <td>${fmtDate(p.verifiedAt)}</td>
             <td>
-              ${p.status === 'PENDING' ? `<button class="btn btn-sm btn-success" onclick="verifyParamedic('${p.id}')">Verify</button>
-              <button class="btn btn-sm btn-danger" onclick="rejectParamedic('${p.id}')">Reject</button>` : ''}
-              <button class="btn-icon" onclick="deleteParamedic('${p.id}')" title="Delete">&#10006;</button>
+              ${p.status === 'PENDING' ? `<button class="btn btn-sm btn-success" data-verify-para="${p.id}">Verify</button>
+              <button class="btn btn-sm btn-danger" data-reject-para="${p.id}">Reject</button>` : ''}
+              <button class="btn-icon" data-delete-para="${p.id}" title="Delete">&#10006;</button>
             </td>
           </tr>`).join('');
         } catch (e) { toast('Failed to load profiles', 'error'); }
@@ -775,9 +812,19 @@
 
       document.getElementById('paraStatusFilter').addEventListener('change', loadParamedics);
       document.getElementById('addParaBtn').addEventListener('click', () => showParaModal());
+
+      document.getElementById('para-table').addEventListener('click', (e) => {
+        const verifyBtn = e.target.closest('[data-verify-para]');
+        const rejectBtn = e.target.closest('[data-reject-para]');
+        const deleteBtn = e.target.closest('[data-delete-para]');
+        if (verifyBtn) verifyParamedic(verifyBtn.dataset.verifyPara);
+        if (rejectBtn) rejectParamedic(rejectBtn.dataset.rejectPara);
+        if (deleteBtn) deleteParamedic(deleteBtn.dataset.deletePara);
+      });
+
       loadParamedics();
 
-      window.showParaModal = async function() {
+      async function showParaModal() {
         let users = [];
         try { users = await apiFetch('/users') || []; } catch(e) {}
         const paramedicUsers = users.filter(u => u.role === 'PARAMEDIC');
@@ -805,7 +852,7 @@
                 <textarea name="notes" rows="3" placeholder="Additional notes..."></textarea>
               </div>
               <div class="modal-actions">
-                <button type="button" class="btn btn-outline" onclick="document.getElementById('paraModal').remove()">Cancel</button>
+                <button type="button" class="btn btn-outline" id="paraModalCancel">Cancel</button>
                 <button type="submit" class="btn btn-primary">Create</button>
               </div>
             </form>
@@ -813,6 +860,7 @@
         `;
         document.body.appendChild(overlay);
         overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        document.getElementById('paraModalCancel').addEventListener('click', () => overlay.remove());
 
         document.getElementById('paraForm').addEventListener('submit', async (e) => {
           e.preventDefault();
@@ -827,33 +875,33 @@
             loadParamedics();
           } catch (err) { toast(err.message, 'error'); }
         });
-      };
+      }
 
-      window.verifyParamedic = async (id) => {
+      async function verifyParamedic(id) {
         try {
           await apiFetch(`/paramedic-profiles/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'VERIFIED' }) });
           toast('Paramedic verified');
           loadParamedics();
         } catch (e) { toast(e.message, 'error'); }
-      };
+      }
 
-      window.rejectParamedic = async (id) => {
-        if (!confirm('Reject this paramedic profile?')) return;
+      async function rejectParamedic(id) {
+        if (!(await confirmModal('Reject this paramedic profile?'))) return;
         try {
           await apiFetch(`/paramedic-profiles/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'REJECTED' }) });
           toast('Profile rejected');
           loadParamedics();
         } catch (e) { toast(e.message, 'error'); }
-      };
+      }
 
-      window.deleteParamedic = async (id) => {
-        if (!confirm('Delete this profile?')) return;
+      async function deleteParamedic(id) {
+        if (!(await confirmModal('Delete this profile?'))) return;
         try {
           await apiFetch(`/paramedic-profiles/${id}`, { method: 'DELETE' });
           toast('Profile deleted');
           loadParamedics();
         } catch (e) { toast(e.message, 'error'); }
-      };
+      }
     };
 
     // ═══════════════════════════════════════════════════════════════
@@ -908,22 +956,34 @@
             <td>${fmtGps(r.pickupLat, r.pickupLng)}</td>
             <td>${fmtDate(r.requestedAt)}</td>
             <td>
-              <button class="btn-icon" onclick="viewRide('${r.id}')" title="View">&#128065;</button>
+              <button class="btn-icon" data-view-ride="${r.id}" title="View">&#128065;</button>
               ${['CREATED','DISPATCHING','WAITING_DRIVER_ACCEPT'].includes(r.status) ?
-                `<button class="btn btn-sm btn-danger" onclick="cancelRide('${r.id}')">Cancel</button>` : ''}
+                `<button class="btn btn-sm btn-danger" data-cancel-ride="${r.id}">Cancel</button>` : ''}
               ${r.status === 'CREATED' ?
-                `<button class="btn btn-sm btn-info" onclick="dispatchRide('${r.id}', '${r.ambulanceType}')">Dispatch</button>` : ''}
+                `<button class="btn btn-sm btn-info" data-dispatch-ride="${r.id}" data-amb-type="${r.ambulanceType}">Dispatch</button>` : ''}
               ${['WAITING_DRIVER_ACCEPT','DRIVER_ACCEPTED','DISPATCHING'].includes(r.status) ?
-                `<button class="btn btn-sm btn-warning" onclick="reassignRide('${r.id}')">Reassign</button>` : ''}
+                `<button class="btn btn-sm btn-warning" data-reassign-ride="${r.id}">Reassign</button>` : ''}
             </td>
           </tr>`).join('');
         } catch (e) { toast('Failed to load rides', 'error'); }
       }
 
       document.getElementById('rideStatusFilter').addEventListener('change', loadRides);
+
+      document.getElementById('rides-table').addEventListener('click', (e) => {
+        const viewBtn = e.target.closest('[data-view-ride]');
+        const cancelBtn = e.target.closest('[data-cancel-ride]');
+        const dispatchBtn = e.target.closest('[data-dispatch-ride]');
+        const reassignBtn = e.target.closest('[data-reassign-ride]');
+        if (viewBtn) viewRide(viewBtn.dataset.viewRide);
+        if (cancelBtn) cancelRide(cancelBtn.dataset.cancelRide);
+        if (dispatchBtn) dispatchRide(dispatchBtn.dataset.dispatchRide, dispatchBtn.dataset.ambType);
+        if (reassignBtn) reassignRide(reassignBtn.dataset.reassignRide);
+      });
+
       loadRides();
 
-      window.viewRide = async (id) => {
+      async function viewRide(id) {
         try {
           const r = await apiFetch(`/ride-requests/${id}`);
           const overlay = document.createElement('div');
@@ -958,25 +1018,26 @@
                 <div class="detail-row"><span class="label">Completed</span><span>${fmtDate(r.completedAt)}</span></div>
               </div>
               <div class="modal-actions">
-                <button class="btn btn-outline" onclick="document.getElementById('rideModal').remove()">Close</button>
+                <button class="btn btn-outline" id="rideModalClose">Close</button>
               </div>
             </div>
           `;
           document.body.appendChild(overlay);
           overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+          document.getElementById('rideModalClose').addEventListener('click', () => overlay.remove());
         } catch (e) { toast(e.message, 'error'); }
-      };
+      }
 
-      window.cancelRide = async (id) => {
-        if (!confirm('Cancel this ride request?')) return;
+      async function cancelRide(id) {
+        if (!(await confirmModal('Cancel this ride request?'))) return;
         try {
           await apiFetch(`/ride-requests/${id}/cancel`, { method: 'PATCH' });
           toast('Ride cancelled');
           loadRides();
         } catch (e) { toast(e.message, 'error'); }
-      };
+      }
 
-      window.dispatchRide = async (id, type) => {
+      async function dispatchRide(id, type) {
         try {
           const result = await apiFetch('/dispatch', {
             method: 'POST',
@@ -989,9 +1050,9 @@
           }
           loadRides();
         } catch (e) { toast(e.message, 'error'); }
-      };
+      }
 
-      window.reassignRide = async (rideId) => {
+      async function reassignRide(rideId) {
         try {
           const ambulances = await apiFetch('/ambulances?status=AVAILABLE');
           if (!ambulances || ambulances.length === 0) {
@@ -1013,7 +1074,7 @@
                   </select>
                 </div>
                 <div class="modal-actions">
-                  <button type="button" class="btn btn-outline" onclick="document.getElementById('reassignModal').remove()">Cancel</button>
+                  <button type="button" class="btn btn-outline" id="reassignModalCancel">Cancel</button>
                   <button type="submit" class="btn btn-warning">Reassign</button>
                 </div>
               </form>
@@ -1021,6 +1082,7 @@
           `;
           document.body.appendChild(overlay);
           overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+          document.getElementById('reassignModalCancel').addEventListener('click', () => overlay.remove());
 
           document.getElementById('reassignForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1036,7 +1098,7 @@
             } catch (err) { toast(err.message, 'error'); }
           });
         } catch (e) { toast(e.message, 'error'); }
-      };
+      }
     };
 
     // ═══════════════════════════════════════════════════════════════
@@ -1088,15 +1150,21 @@
             <td>${statusBadge(a.status)}</td>
             <td>${Number(a.currentLat).toFixed(6)}</td>
             <td>${Number(a.currentLng).toFixed(6)}</td>
-            <td><button class="btn btn-sm btn-outline" onclick="viewHistory('${a.id}', '${a.registrationNumber || a.id}')">History</button></td>
+            <td><button class="btn btn-sm btn-outline" data-view-history="${a.id}" data-amb-name="${a.registrationNumber || a.id}">History</button></td>
           </tr>`).join('');
         } catch (e) { toast('Failed to load tracking', 'error'); }
       }
 
       document.getElementById('refreshTracking').addEventListener('click', loadTracking);
+
+      document.getElementById('tracking-table').addEventListener('click', (e) => {
+        const histBtn = e.target.closest('[data-view-history]');
+        if (histBtn) viewHistory(histBtn.dataset.viewHistory, histBtn.dataset.ambName);
+      });
+
       loadTracking();
 
-      window.viewHistory = async (ambId, name) => {
+      async function viewHistory(ambId, name) {
         try {
           const data = await apiFetch(`/tracking/${ambId}/history`);
           const section = document.getElementById('history-section');
@@ -1114,7 +1182,7 @@
           }
           section.scrollIntoView({ behavior: 'smooth' });
         } catch (e) { toast(e.message, 'error'); }
-      };
+      }
     };
 
     // ═══════════════════════════════════════════════════════════════
@@ -1297,16 +1365,22 @@
               <td>${p.averageResponseTime ? p.averageResponseTime + ' min' : '—'}</td>
               <td style="color: ${p.rating >= 4 ? 'var(--success)' : p.rating >= 3 ? 'var(--warning)' : 'var(--error)'};">${stars}</td>
               <td>${fmtDate(p.lastActive)}</td>
-              <td><button class="btn btn-sm btn-outline" onclick="editPerf('${p.driverId}', '${p.driver?.name || ''}')">Edit</button></td>
+              <td><button class="btn btn-sm btn-outline" data-edit-perf="${p.driverId}" data-perf-name="${p.driver?.name || ''}">Edit</button></td>
             </tr>`;
           }).join('');
         } catch (e) { toast('Failed to load performance', 'error'); }
       }
 
       document.getElementById('perfSort').addEventListener('change', loadPerf);
+
+      document.getElementById('perf-table').addEventListener('click', (e) => {
+        const editBtn = e.target.closest('[data-edit-perf]');
+        if (editBtn) editPerf(editBtn.dataset.editPerf, editBtn.dataset.perfName);
+      });
+
       loadPerf();
 
-      window.editPerf = async (driverId, name) => {
+      async function editPerf(driverId, name) {
         let perf;
         try { perf = await apiFetch(`/driver-performance/${driverId}`); } catch(e) { return toast(e.message, 'error'); }
         const overlay = document.createElement('div');
@@ -1331,7 +1405,7 @@
                 <input name="averageResponseTime" type="number" step="0.1" min="0" value="${perf.averageResponseTime || ''}" />
               </div>
               <div class="modal-actions">
-                <button type="button" class="btn btn-outline" onclick="document.getElementById('perfModal').remove()">Cancel</button>
+                <button type="button" class="btn btn-outline" id="perfModalCancel">Cancel</button>
                 <button type="submit" class="btn btn-primary">Update</button>
               </div>
             </form>
@@ -1339,6 +1413,7 @@
         `;
         document.body.appendChild(overlay);
         overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        document.getElementById('perfModalCancel').addEventListener('click', () => overlay.remove());
 
         document.getElementById('perfForm').addEventListener('submit', async (e) => {
           e.preventDefault();
@@ -1354,7 +1429,7 @@
             loadPerf();
           } catch (err) { toast(err.message, 'error'); }
         });
-      };
+      }
     };
 
     // ═══════════════════════════════════════════════════════════════
@@ -1408,8 +1483,8 @@
             <td>${u.isActive ? '<span style="color:var(--success)">Yes</span>' : '<span style="color:var(--error)">No</span>'}</td>
             <td>${fmtDate(u.createdAt)}</td>
             <td>
-              <button class="btn-icon" onclick="editUser('${u.id}')" title="Edit">&#9998;</button>
-              <button class="btn-icon" onclick="deleteUser('${u.id}')" title="Delete" style="color:var(--error)">&#10005;</button>
+              <button class="btn-icon" data-edit-user="${u.id}" title="Edit">&#9998;</button>
+              <button class="btn-icon" data-delete-user="${u.id}" title="Delete" style="color:var(--error)">&#10005;</button>
             </td>
           </tr>`).join('');
         } catch (e) { toast(e.message, 'error'); }
@@ -1422,21 +1497,28 @@
         showUserModal();
       });
 
-      window.editUser = async (id) => {
+      document.getElementById('users-table').addEventListener('click', (e) => {
+        const editBtn = e.target.closest('[data-edit-user]');
+        const deleteBtn = e.target.closest('[data-delete-user]');
+        if (editBtn) editUser(editBtn.dataset.editUser);
+        if (deleteBtn) deleteUser(deleteBtn.dataset.deleteUser);
+      });
+
+      async function editUser(id) {
         try {
           const u = await apiFetch('/users/' + id);
           showUserModal(u);
         } catch (e) { toast(e.message, 'error'); }
-      };
+      }
 
-      window.deleteUser = async (id) => {
-        if (!confirm('Delete this user?')) return;
+      async function deleteUser(id) {
+        if (!(await confirmModal('Delete this user?'))) return;
         try {
           await apiFetch('/users/' + id, { method: 'DELETE' });
           toast('User deleted');
           loadUsers();
         } catch (e) { toast(e.message, 'error'); }
-      };
+      }
 
       function showUserModal(existing) {
         const isEdit = !!existing;
@@ -1472,7 +1554,7 @@
                 </div>
               </div>
               <div class="modal-actions">
-                <button type="button" class="btn btn-outline" onclick="document.getElementById('userModal').remove()">Cancel</button>
+                <button type="button" class="btn btn-outline" id="userModalCancel">Cancel</button>
                 <button type="submit" class="btn btn-primary">${isEdit ? 'Update' : 'Create'}</button>
               </div>
             </form>
@@ -1480,6 +1562,7 @@
         `;
         document.body.appendChild(overlay);
         overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        document.getElementById('userModalCancel').addEventListener('click', () => overlay.remove());
 
         document.getElementById('userForm').addEventListener('submit', async (e) => {
           e.preventDefault();
@@ -1537,8 +1620,8 @@
             <td>${o.contactPhone || '—'}</td>
             <td>${fmtDate(o.createdAt)}</td>
             <td>
-              <button class="btn-icon" onclick="editOrg('${o.id}')" title="Edit">&#9998;</button>
-              <button class="btn-icon" onclick="deleteOrg('${o.id}')" title="Delete" style="color:var(--error)">&#10005;</button>
+              <button class="btn-icon" data-edit-org="${o.id}" title="Edit">&#9998;</button>
+              <button class="btn-icon" data-delete-org="${o.id}" title="Delete" style="color:var(--error)">&#10005;</button>
             </td>
           </tr>`).join('');
         } catch (e) { toast(e.message, 'error'); }
@@ -1546,21 +1629,28 @@
 
       document.getElementById('addOrgBtn').addEventListener('click', () => showOrgModal());
 
-      window.editOrg = async (id) => {
+      document.getElementById('orgs-table').addEventListener('click', (e) => {
+        const editBtn = e.target.closest('[data-edit-org]');
+        const deleteBtn = e.target.closest('[data-delete-org]');
+        if (editBtn) editOrg(editBtn.dataset.editOrg);
+        if (deleteBtn) deleteOrg(deleteBtn.dataset.deleteOrg);
+      });
+
+      async function editOrg(id) {
         try {
           const o = await apiFetch('/organizations/' + id);
           showOrgModal(o);
         } catch (e) { toast(e.message, 'error'); }
-      };
+      }
 
-      window.deleteOrg = async (id) => {
-        if (!confirm('Delete this organization? All linked ambulances and hospitals will also be removed.')) return;
+      async function deleteOrg(id) {
+        if (!(await confirmModal('Delete this organization? All linked ambulances and hospitals will also be removed.'))) return;
         try {
           await apiFetch('/organizations/' + id, { method: 'DELETE' });
           toast('Organization deleted');
           loadOrgs();
         } catch (e) { toast(e.message, 'error'); }
-      };
+      }
 
       function showOrgModal(existing) {
         const isEdit = !!existing;
@@ -1578,7 +1668,7 @@
                 <div class="form-group"><label>Contact Phone</label><input name="contactPhone" value="${existing?.contactPhone || ''}"></div>
               </div>
               <div class="modal-actions">
-                <button type="button" class="btn btn-outline" onclick="document.getElementById('orgModal').remove()">Cancel</button>
+                <button type="button" class="btn btn-outline" id="orgModalCancel">Cancel</button>
                 <button type="submit" class="btn btn-primary">${isEdit ? 'Update' : 'Create'}</button>
               </div>
             </form>
@@ -1586,6 +1676,7 @@
         `;
         document.body.appendChild(overlay);
         overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        document.getElementById('orgModalCancel').addEventListener('click', () => overlay.remove());
 
         document.getElementById('orgForm').addEventListener('submit', async (e) => {
           e.preventDefault();
@@ -1646,8 +1737,8 @@
             <td>${h.organization ? h.organization.name : '—'}</td>
             <td>${fmtGps(h.locationLat, h.locationLng)}</td>
             <td>
-              <button class="btn-icon" onclick="editHosp('${h.id}')" title="Edit">&#9998;</button>
-              <button class="btn-icon" onclick="deleteHosp('${h.id}')" title="Delete" style="color:var(--error)">&#10005;</button>
+              <button class="btn-icon" data-edit-hosp="${h.id}" title="Edit">&#9998;</button>
+              <button class="btn-icon" data-delete-hosp="${h.id}" title="Delete" style="color:var(--error)">&#10005;</button>
             </td>
           </tr>`).join('');
         } catch (e) { toast(e.message, 'error'); }
@@ -1655,21 +1746,28 @@
 
       document.getElementById('addHospBtn').addEventListener('click', () => showHospModal());
 
-      window.editHosp = async (id) => {
+      document.getElementById('hosp-table').addEventListener('click', (e) => {
+        const editBtn = e.target.closest('[data-edit-hosp]');
+        const deleteBtn = e.target.closest('[data-delete-hosp]');
+        if (editBtn) editHosp(editBtn.dataset.editHosp);
+        if (deleteBtn) deleteHosp(deleteBtn.dataset.deleteHosp);
+      });
+
+      async function editHosp(id) {
         try {
           const h = await apiFetch('/hospitals/' + id);
           showHospModal(h);
         } catch (e) { toast(e.message, 'error'); }
-      };
+      }
 
-      window.deleteHosp = async (id) => {
-        if (!confirm('Delete this hospital?')) return;
+      async function deleteHosp(id) {
+        if (!(await confirmModal('Delete this hospital?'))) return;
         try {
           await apiFetch('/hospitals/' + id, { method: 'DELETE' });
           toast('Hospital deleted');
           loadHospitals();
         } catch (e) { toast(e.message, 'error'); }
-      };
+      }
 
       function showHospModal(existing) {
         const isEdit = !!existing;
@@ -1695,7 +1793,7 @@
                 <div class="form-group"><label>Longitude</label><input name="locationLng" type="number" step="any" value="${existing?.locationLng || ''}"></div>
               </div>
               <div class="modal-actions">
-                <button type="button" class="btn btn-outline" onclick="document.getElementById('hospModal').remove()">Cancel</button>
+                <button type="button" class="btn btn-outline" id="hospModalCancel">Cancel</button>
                 <button type="submit" class="btn btn-primary">${isEdit ? 'Update' : 'Create'}</button>
               </div>
             </form>
@@ -1703,6 +1801,7 @@
         `;
         document.body.appendChild(overlay);
         overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        document.getElementById('hospModalCancel').addEventListener('click', () => overlay.remove());
 
         document.getElementById('hospForm').addEventListener('submit', async (e) => {
           e.preventDefault();
