@@ -40,4 +40,9 @@ export class CreateUserDto {
   @IsOptional()
   @IsBoolean()
   verified?: boolean;
+
+  @ApiPropertyOptional({ default: true })
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
 }

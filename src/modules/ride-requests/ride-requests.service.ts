@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { RideRequestStatus, AmbulanceStatus } from '@prisma/client';
+import { Role, RideRequestStatus, AmbulanceStatus } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { CreateRideRequestDto } from './dto/create-ride-request.dto';
+import { AdminCreateRideRequestDto } from './dto/admin-create-ride-request.dto';
 import { UpdateRideRequestStatusDto } from './dto/update-ride-request-status.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 
@@ -20,7 +21,6 @@ export class RideRequestsService {
     assignedDriver: { select: { id: true, name: true, phone: true } },
     assignedParamedic: { select: { id: true, name: true } },
     ambulance: { select: { id: true, registrationNumber: true, type: true, status: true } },
-    hospital: { select: { id: true, name: true } },
   };
 
   /**
@@ -53,6 +53,27 @@ export class RideRequestsService {
       data: {
         userId,
         ...dto,
+        status: RideRequestStatus.CREATED,
+      },
+      include: this.include,
+    });
+  }
+
+  async createAsAdmin(dto: AdminCreateRideRequestDto) {
+    const patient = await this.prisma.user.findUnique({
+      where: { id: dto.userId },
+      select: { id: true, role: true },
+    });
+    if (!patient) throw new NotFoundException('Patient user not found');
+    if (patient.role !== Role.USER) {
+      throw new BadRequestException('Ride requests can only be created for users with role USER');
+    }
+
+    const { userId, ...rest } = dto;
+    return this.prisma.rideRequest.create({
+      data: {
+        userId,
+        ...rest,
         status: RideRequestStatus.CREATED,
       },
       include: this.include,

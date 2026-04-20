@@ -175,7 +175,12 @@
     td {
       padding: 12px 20px; font-size: 14px;
       border-bottom: 1px solid var(--card-border);
+      vertical-align: middle;
     }
+
+    td:last-child { white-space: nowrap; }
+    td:last-child > button { margin-right: 4px; vertical-align: middle; }
+    td:last-child > button:last-child { margin-right: 0; }
 
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: rgba(255,255,255,0.02); }
@@ -203,7 +208,7 @@
     .btn-primary { background: var(--primary); }
     .btn-primary:hover { background: var(--primary-dark); }
 
-    .btn-sm { padding: 5px 12px; font-size: 12px; }
+    .btn-sm { padding: 5px 12px; font-size: 12px; line-height: 1.4; border: 1px solid transparent; }
 
     .btn-success { background: var(--success); }
     .btn-warning { background: var(--warning); color: #000; }
@@ -216,8 +221,9 @@
     .btn-outline:hover { border-color: var(--text-muted); }
 
     .btn-icon {
-      padding: 6px 10px; background: transparent; border: 1px solid var(--card-border);
+      padding: 5px 10px; background: transparent; border: 1px solid var(--card-border);
       color: var(--text-muted); border-radius: 6px; cursor: pointer; font-size: 14px;
+      line-height: 1.4;
     }
     .btn-icon:hover { color: var(--text); border-color: var(--text-muted); }
 
@@ -361,8 +367,8 @@
       <button class="nav-item" data-page="users"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Users</button>
       <button class="nav-item" data-page="ambulances"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 15h4l3-8h4l2 8h5"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/><path d="M1 15h1m20 0h1"/><rect x="5" y="7" width="10" height="8" rx="1"/><path d="M15 7h2l3 4v4h-5"/><path d="M7 11h4"/><path d="M9 9v4"/></svg></span> Ambulances</button>
       <button class="nav-item" data-page="organizations"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/></svg></span> Organizations</button>
-      <button class="nav-item" data-page="hospitals"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M12 7v4"/><path d="M10 9h4"/><path d="M9 21v-4h6v4"/></svg></span> Hospitals</button>
       <button class="nav-item" data-page="paramedics"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6 6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg></span> Paramedic Profiles</button>
+      <button class="nav-item" data-page="drivers"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5 22v-3a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v3"/><path d="M9 11h6"/></svg></span> Driver Profiles</button>
 
       <div class="nav-section">Operations</div>
       <button class="nav-item" data-page="rides"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span> Ride Requests</button>
@@ -905,6 +911,157 @@
     };
 
     // ═══════════════════════════════════════════════════════════════
+    // PAGE: Driver Profiles (Full CRUD)
+    // ═══════════════════════════════════════════════════════════════
+    pages.drivers = async () => {
+      const main = document.getElementById('mainContent');
+      main.innerHTML = `
+        <div class="page-header">
+          <div><h1>Driver Profiles</h1><p>Manage driver registrations & verifications</p></div>
+          <button class="btn btn-primary" id="addDrvBtn">+ Add Profile</button>
+        </div>
+        <div class="table-section">
+          <div class="table-header">
+            <h3>All Profiles</h3>
+            <div class="filters">
+              <select class="filter-select" id="drvStatusFilter">
+                <option value="">All Statuses</option>
+                <option value="PENDING">Pending</option>
+                <option value="VERIFIED">Verified</option>
+                <option value="REJECTED">Rejected</option>
+              </select>
+            </div>
+          </div>
+          <table><thead><tr><th>Name</th><th>Email</th><th>License #</th><th>Experience</th><th>Status</th><th>Verified At</th><th>Actions</th></tr></thead>
+          <tbody id="drv-table"><tr class="loading-row"><td colspan="7"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
+        </div>
+      `;
+
+      async function loadDrivers() {
+        const status = document.getElementById('drvStatusFilter').value;
+        const qs = status ? `?status=${status}` : '';
+        try {
+          const data = await apiFetch(`/driver-profiles${qs}`);
+          const tbody = document.getElementById('drv-table');
+          if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No driver profiles found</td></tr>';
+            return;
+          }
+          tbody.innerHTML = data.map(p => `<tr>
+            <td>${p.user ? p.user.name : '—'}</td>
+            <td>${p.user ? p.user.email || '—' : '—'}</td>
+            <td>${p.licenseNumber || '—'}</td>
+            <td>${p.experienceYears != null ? p.experienceYears + ' yrs' : '—'}</td>
+            <td>${statusBadge(p.status)}</td>
+            <td>${fmtDate(p.verifiedAt)}</td>
+            <td>
+              ${p.status === 'PENDING' ? `<button class="btn btn-sm btn-success" data-verify-drv="${p.id}">Verify</button>
+              <button class="btn btn-sm btn-danger" data-reject-drv="${p.id}">Reject</button>` : ''}
+              <button class="btn-icon" data-delete-drv="${p.id}" title="Delete">&#10006;</button>
+            </td>
+          </tr>`).join('');
+        } catch (e) { toast('Failed to load profiles', 'error'); }
+      }
+
+      document.getElementById('drvStatusFilter').addEventListener('change', loadDrivers);
+      document.getElementById('addDrvBtn').addEventListener('click', () => showDrvModal());
+
+      document.getElementById('drv-table').addEventListener('click', (e) => {
+        const verifyBtn = e.target.closest('[data-verify-drv]');
+        const rejectBtn = e.target.closest('[data-reject-drv]');
+        const deleteBtn = e.target.closest('[data-delete-drv]');
+        if (verifyBtn) verifyDriver(verifyBtn.dataset.verifyDrv);
+        if (rejectBtn) rejectDriver(rejectBtn.dataset.rejectDrv);
+        if (deleteBtn) deleteDriver(deleteBtn.dataset.deleteDrv);
+      });
+
+      loadDrivers();
+
+      async function showDrvModal() {
+        let users = [];
+        try { users = await apiFetch('/users?role=DRIVER') || []; } catch(e) {}
+
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.id = 'drvModal';
+        overlay.innerHTML = `
+          <div class="modal">
+            <h2>Create Driver Profile</h2>
+            <form id="drvForm">
+              <div class="form-group">
+                <label>Driver User</label>
+                <select name="userId" required>
+                  <option value="">Select User (DRIVER role)</option>
+                  ${users.map(u => `<option value="${u.id}">${u.name} (${u.email || u.phone})</option>`).join('')}
+                </select>
+              </div>
+              <div class="form-group">
+                <label>License Number</label>
+                <input name="licenseNumber" placeholder="LHR-DL-123456" />
+              </div>
+              <div class="form-group">
+                <label>Experience (years)</label>
+                <input name="experienceYears" type="number" min="0" placeholder="3" />
+              </div>
+              <div class="form-group">
+                <label>Notes</label>
+                <textarea name="notes" rows="3" placeholder="Additional notes..."></textarea>
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn btn-outline" id="drvModalCancel">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+              </div>
+            </form>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        document.getElementById('drvModalCancel').addEventListener('click', () => overlay.remove());
+
+        document.getElementById('drvForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const fd = new FormData(e.target);
+          const body = { userId: fd.get('userId') };
+          if (fd.get('licenseNumber')) body.licenseNumber = fd.get('licenseNumber');
+          if (fd.get('experienceYears')) body.experienceYears = parseInt(fd.get('experienceYears'));
+          if (fd.get('notes')) body.notes = fd.get('notes');
+          try {
+            await apiFetch('/driver-profiles', { method: 'POST', body: JSON.stringify(body) });
+            toast('Profile created');
+            overlay.remove();
+            loadDrivers();
+          } catch (err) { toast(err.message, 'error'); }
+        });
+      }
+
+      async function verifyDriver(id) {
+        try {
+          await apiFetch(`/driver-profiles/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'VERIFIED' }) });
+          toast('Driver verified');
+          loadDrivers();
+        } catch (e) { toast(e.message, 'error'); }
+      }
+
+      async function rejectDriver(id) {
+        if (!(await confirmModal('Reject this driver profile?'))) return;
+        try {
+          await apiFetch(`/driver-profiles/${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'REJECTED' }) });
+          toast('Profile rejected');
+          loadDrivers();
+        } catch (e) { toast(e.message, 'error'); }
+      }
+
+      async function deleteDriver(id) {
+        if (!(await confirmModal('Delete this profile?'))) return;
+        try {
+          await apiFetch(`/driver-profiles/${id}`, { method: 'DELETE' });
+          toast('Profile deleted');
+          loadDrivers();
+        } catch (e) { toast(e.message, 'error'); }
+      }
+    };
+
+    // ═══════════════════════════════════════════════════════════════
     // PAGE: Ride Requests
     // ═══════════════════════════════════════════════════════════════
     pages.rides = async () => {
@@ -912,6 +1069,7 @@
       main.innerHTML = `
         <div class="page-header">
           <div><h1>Ride Requests</h1><p>Monitor incoming emergency requests</p></div>
+          <button class="btn btn-primary" id="addRideBtn">+ New Ride</button>
         </div>
         <div class="table-section">
           <div class="table-header">
@@ -969,6 +1127,70 @@
       }
 
       document.getElementById('rideStatusFilter').addEventListener('change', loadRides);
+      document.getElementById('addRideBtn').addEventListener('click', () => showNewRideModal());
+
+      async function showNewRideModal() {
+        let patients = [];
+        try { patients = await apiFetch('/users?role=USER') || []; } catch(e) {}
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.id = 'newRideModal';
+        overlay.innerHTML = `
+          <div class="modal">
+            <h2>New Ride Request</h2>
+            <form id="newRideForm">
+              <div class="form-group">
+                <label>Patient</label>
+                <select name="userId" required>
+                  <option value="">Select patient</option>
+                  ${patients.map(u => `<option value="${u.id}">${u.name} (${u.email || u.phone || ''})</option>`).join('')}
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Ambulance Type</label>
+                <select name="ambulanceType" required>
+                  <option value="BASIC">BASIC</option>
+                  <option value="WITH_DOCTOR">WITH_DOCTOR</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>Pickup Latitude</label><input name="pickupLat" type="number" step="any" required></div>
+                <div class="form-group"><label>Pickup Longitude</label><input name="pickupLng" type="number" step="any" required></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>Destination Latitude</label><input name="destinationLat" type="number" step="any"></div>
+                <div class="form-group"><label>Destination Longitude</label><input name="destinationLng" type="number" step="any"></div>
+              </div>
+              <div class="modal-actions">
+                <button type="button" class="btn btn-outline" id="newRideModalCancel">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+              </div>
+            </form>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+        document.getElementById('newRideModalCancel').addEventListener('click', () => overlay.remove());
+
+        document.getElementById('newRideForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const fd = new FormData(e.target);
+          const body = {
+            userId: fd.get('userId'),
+            ambulanceType: fd.get('ambulanceType'),
+            pickupLat: parseFloat(fd.get('pickupLat')),
+            pickupLng: parseFloat(fd.get('pickupLng')),
+          };
+          if (fd.get('destinationLat')) body.destinationLat = parseFloat(fd.get('destinationLat'));
+          if (fd.get('destinationLng')) body.destinationLng = parseFloat(fd.get('destinationLng'));
+          try {
+            await apiFetch('/ride-requests/admin', { method: 'POST', body: JSON.stringify(body) });
+            toast('Ride request created');
+            overlay.remove();
+            loadRides();
+          } catch (err) { toast(err.message, 'error'); }
+        });
+      }
 
       document.getElementById('rides-table').addEventListener('click', (e) => {
         const viewBtn = e.target.closest('[data-view-ride]');
@@ -1007,7 +1229,6 @@
                   <div class="detail-row"><span class="label">Driver</span><span>${r.assignedDriver ? r.assignedDriver.name : '—'}</span></div>
                   <div class="detail-row"><span class="label">Paramedic</span><span>${r.assignedParamedic ? r.assignedParamedic.name : '—'}</span></div>
                   <div class="detail-row"><span class="label">Ambulance</span><span>${r.ambulance ? r.ambulance.registrationNumber : '—'}</span></div>
-                  <div class="detail-row"><span class="label">Hospital</span><span>${r.hospital ? r.hospital.name : '—'}</span></div>
                 </div>
               </div>
               <div class="detail-card">
@@ -1223,11 +1444,11 @@
             <div class="form-row">
               <div class="form-group">
                 <label>Latitude</label>
-                <input type="number" step="any" id="nearLat" placeholder="24.8607" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" />
+                <input type="number" step="any" min="-90" max="90" id="nearLat" value="24.8700" placeholder="24.8607" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" />
               </div>
               <div class="form-group">
                 <label>Longitude</label>
-                <input type="number" step="any" id="nearLng" placeholder="67.0011" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" />
+                <input type="number" step="any" min="-180" max="180" id="nearLng" value="67.0100" placeholder="67.0011" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" />
               </div>
             </div>
             <button class="btn btn-info" id="findNearestBtn" style="width:100%;">Find Nearest</button>
@@ -1238,10 +1459,10 @@
         <div class="detail-card">
           <h4>Distance Calculator (Haversine)</h4>
           <div class="form-row">
-            <div class="form-group"><label>Point A — Lat</label><input type="number" step="any" id="dLat1" placeholder="24.8607" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" /></div>
-            <div class="form-group"><label>Point A — Lng</label><input type="number" step="any" id="dLng1" placeholder="67.0011" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" /></div>
-            <div class="form-group"><label>Point B — Lat</label><input type="number" step="any" id="dLat2" placeholder="24.9200" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" /></div>
-            <div class="form-group"><label>Point B — Lng</label><input type="number" step="any" id="dLng2" placeholder="67.0500" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" /></div>
+            <div class="form-group"><label>Point A — Lat</label><input type="number" step="any" min="-90" max="90" id="dLat1" value="24.8607" placeholder="24.8607" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" /></div>
+            <div class="form-group"><label>Point A — Lng</label><input type="number" step="any" min="-180" max="180" id="dLng1" value="67.0011" placeholder="67.0011" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" /></div>
+            <div class="form-group"><label>Point B — Lat</label><input type="number" step="any" min="-90" max="90" id="dLat2" value="24.9200" placeholder="24.9200" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" /></div>
+            <div class="form-group"><label>Point B — Lng</label><input type="number" step="any" min="-180" max="180" id="dLng2" value="67.0500" placeholder="67.0500" style="width:100%; padding:10px; background:var(--input-bg); border:1px solid var(--card-border); border-radius:8px; color:var(--text);" /></div>
           </div>
           <button class="btn btn-outline" id="calcDistBtn" style="margin-top:8px;">Calculate Distance</button>
           <div id="distResult" style="margin-top:12px;"></div>
@@ -1292,6 +1513,9 @@
         const lat = document.getElementById('nearLat').value;
         const lng = document.getElementById('nearLng').value;
         if (!lat || !lng) return toast('Enter coordinates', 'error');
+        const latN = parseFloat(lat), lngN = parseFloat(lng);
+        if (isNaN(latN) || latN < -90 || latN > 90) return toast('Latitude must be between -90 and 90 (e.g. 24.8700)', 'error');
+        if (isNaN(lngN) || lngN < -180 || lngN > 180) return toast('Longitude must be between -180 and 180 (e.g. 67.0100)', 'error');
         const resultDiv = document.getElementById('nearestResult');
         resultDiv.innerHTML = '<span class="spinner-inline"></span> Searching...';
         try {
@@ -1644,7 +1868,7 @@
       }
 
       async function deleteOrg(id) {
-        if (!(await confirmModal('Delete this organization? All linked ambulances and hospitals will also be removed.'))) return;
+        if (!(await confirmModal('Delete this organization? All linked ambulances will also be removed.'))) return;
         try {
           await apiFetch('/organizations/' + id, { method: 'DELETE' });
           toast('Organization deleted');
@@ -1700,132 +1924,6 @@
       }
 
       loadOrgs();
-    };
-
-    // ═══════════════════════════════════════════════════════════════
-    // PAGE: Hospitals (CRUD)
-    // ═══════════════════════════════════════════════════════════════
-    pages.hospitals = async () => {
-      const main = document.getElementById('mainContent');
-      main.innerHTML = `
-        <div class="page-header">
-          <div><h1>Hospitals</h1><p>Manage hospitals linked to organizations</p></div>
-          <button class="btn btn-primary" id="addHospBtn">+ Add Hospital</button>
-        </div>
-        <div class="table-section">
-          <div class="table-header"><h3>All Hospitals</h3></div>
-          <table><thead><tr><th>Name</th><th>Address</th><th>Phone</th><th>Organization</th><th>Location</th><th>Actions</th></tr></thead>
-          <tbody id="hosp-table"><tr class="loading-row"><td colspan="6"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
-        </div>
-      `;
-
-      let allOrgs = [];
-      try { allOrgs = await apiFetch('/organizations') || []; } catch(e) {}
-
-      async function loadHospitals() {
-        try {
-          const data = await apiFetch('/hospitals');
-          const tbody = document.getElementById('hosp-table');
-          if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No hospitals found</td></tr>';
-            return;
-          }
-          tbody.innerHTML = data.map(h => `<tr>
-            <td>${h.name}</td>
-            <td>${h.address || '—'}</td>
-            <td>${h.contactPhone || '—'}</td>
-            <td>${h.organization ? h.organization.name : '—'}</td>
-            <td>${fmtGps(h.locationLat, h.locationLng)}</td>
-            <td>
-              <button class="btn-icon" data-edit-hosp="${h.id}" title="Edit">&#9998;</button>
-              <button class="btn-icon" data-delete-hosp="${h.id}" title="Delete" style="color:var(--error)">&#10005;</button>
-            </td>
-          </tr>`).join('');
-        } catch (e) { toast(e.message, 'error'); }
-      }
-
-      document.getElementById('addHospBtn').addEventListener('click', () => showHospModal());
-
-      document.getElementById('hosp-table').addEventListener('click', (e) => {
-        const editBtn = e.target.closest('[data-edit-hosp]');
-        const deleteBtn = e.target.closest('[data-delete-hosp]');
-        if (editBtn) editHosp(editBtn.dataset.editHosp);
-        if (deleteBtn) deleteHosp(deleteBtn.dataset.deleteHosp);
-      });
-
-      async function editHosp(id) {
-        try {
-          const h = await apiFetch('/hospitals/' + id);
-          showHospModal(h);
-        } catch (e) { toast(e.message, 'error'); }
-      }
-
-      async function deleteHosp(id) {
-        if (!(await confirmModal('Delete this hospital?'))) return;
-        try {
-          await apiFetch('/hospitals/' + id, { method: 'DELETE' });
-          toast('Hospital deleted');
-          loadHospitals();
-        } catch (e) { toast(e.message, 'error'); }
-      }
-
-      function showHospModal(existing) {
-        const isEdit = !!existing;
-        const overlay = document.createElement('div');
-        overlay.className = 'modal-overlay';
-        overlay.id = 'hospModal';
-        overlay.innerHTML = `
-          <div class="modal">
-            <h2>${isEdit ? 'Edit' : 'Add'} Hospital</h2>
-            <form id="hospForm">
-              <div class="form-group"><label>Name</label><input name="name" value="${existing?.name || ''}" required></div>
-              <div class="form-group"><label>Address</label><input name="address" value="${existing?.address || ''}"></div>
-              <div class="form-group"><label>Contact Phone</label><input name="contactPhone" value="${existing?.contactPhone || ''}"></div>
-              <div class="form-group">
-                <label>Organization</label>
-                <select name="organizationId" required>
-                  <option value="">Select Organization</option>
-                  ${allOrgs.map(o => `<option value="${o.id}" ${existing?.organizationId === o.id ? 'selected' : ''}>${o.name}</option>`).join('')}
-                </select>
-              </div>
-              <div class="form-row">
-                <div class="form-group"><label>Latitude</label><input name="locationLat" type="number" step="any" value="${existing?.locationLat || ''}"></div>
-                <div class="form-group"><label>Longitude</label><input name="locationLng" type="number" step="any" value="${existing?.locationLng || ''}"></div>
-              </div>
-              <div class="modal-actions">
-                <button type="button" class="btn btn-outline" id="hospModalCancel">Cancel</button>
-                <button type="submit" class="btn btn-primary">${isEdit ? 'Update' : 'Create'}</button>
-              </div>
-            </form>
-          </div>
-        `;
-        document.body.appendChild(overlay);
-        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
-        document.getElementById('hospModalCancel').addEventListener('click', () => overlay.remove());
-
-        document.getElementById('hospForm').addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const fd = new FormData(e.target);
-          const body = { name: fd.get('name'), organizationId: fd.get('organizationId') };
-          if (fd.get('address')) body.address = fd.get('address');
-          if (fd.get('contactPhone')) body.contactPhone = fd.get('contactPhone');
-          if (fd.get('locationLat')) body.locationLat = parseFloat(fd.get('locationLat'));
-          if (fd.get('locationLng')) body.locationLng = parseFloat(fd.get('locationLng'));
-          try {
-            if (isEdit) {
-              await apiFetch('/hospitals/' + existing.id, { method: 'PATCH', body: JSON.stringify(body) });
-              toast('Hospital updated');
-            } else {
-              await apiFetch('/hospitals', { method: 'POST', body: JSON.stringify(body) });
-              toast('Hospital created');
-            }
-            overlay.remove();
-            loadHospitals();
-          } catch (err) { toast(err.message, 'error'); }
-        });
-      }
-
-      loadHospitals();
     };
 
     // ═══════════════════════════════════════════════════════════════

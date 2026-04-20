@@ -3,6 +3,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger'
 import { Role, RideRequestStatus } from '@prisma/client';
 import { RideRequestsService } from './ride-requests.service';
 import { CreateRideRequestDto } from './dto/create-ride-request.dto';
+import { AdminCreateRideRequestDto } from './dto/admin-create-ride-request.dto';
 import { UpdateRideRequestStatusDto } from './dto/update-ride-request-status.dto';
 import { RateRideDto } from './dto/rate-ride.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
@@ -24,6 +25,13 @@ export class RideRequestsController {
   @ApiOperation({ summary: 'Create ride request (User)' })
   create(@CurrentUser() user: any, @Body() dto: CreateRideRequestDto) {
     return this.service.create(user.id, dto);
+  }
+
+  @Post('admin')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Create ride request on behalf of a user (Admin)' })
+  createAsAdmin(@Body() dto: AdminCreateRideRequestDto) {
+    return this.service.createAsAdmin(dto);
   }
 
   @Get()

@@ -23,7 +23,6 @@ async function main() {
   await prisma.rideRequest.deleteMany();
   await prisma.paramedicProfile.deleteMany();
   await prisma.ambulance.deleteMany();
-  await prisma.hospital.deleteMany();
   await prisma.organization.deleteMany();
   console.log('  🧹 Cleared existing seed data\n');
 
@@ -170,41 +169,6 @@ async function main() {
   });
   console.log(`  ✅ Organizations: ${org1.name}, ${org2.name}`);
 
-  // ── 3. Hospitals ────────────────────────────────────────────────
-  const hospital1 = await prisma.hospital.create({
-    data: {
-      name: 'City General Hospital',
-      address: '789 Hospital Road, Karachi',
-      contactPhone: '+923005555555',
-      locationLat: 24.8600,
-      locationLng: 67.0000,
-      organizationId: org1.id,
-    },
-  });
-
-  const hospital2 = await prisma.hospital.create({
-    data: {
-      name: 'Emergency Care Center',
-      address: '321 Emergency Street, Karachi',
-      contactPhone: '+923006666666',
-      locationLat: 24.9200,
-      locationLng: 67.0500,
-      organizationId: org1.id,
-    },
-  });
-
-  const hospital3 = await prisma.hospital.create({
-    data: {
-      name: 'Lahore Medical Complex',
-      address: '100 Medical Avenue, Lahore',
-      contactPhone: '+923007777777',
-      locationLat: 31.5204,
-      locationLng: 74.3587,
-      organizationId: org2.id,
-    },
-  });
-  console.log(`  ✅ Hospitals: ${hospital1.name}, ${hospital2.name}, ${hospital3.name}`);
-
   // ── 4. Ambulances ──────────────────────────────────────────────
   const amb1 = await prisma.ambulance.create({
     data: {
@@ -301,7 +265,6 @@ async function main() {
       destinationLng: 67.0000,
       status: RideRequestStatus.CREATED,
       paymentMethod: PaymentMethod.CASH,
-      hospitalId: hospital1.id,
     },
   });
 
@@ -317,7 +280,6 @@ async function main() {
       assignedDriverId: driver1.id,
       assignedParamedicId: paramedic1.id,
       ambulanceId: amb3.id,
-      hospitalId: hospital2.id,
       etaMinutes: 8,
       paymentMethod: PaymentMethod.CASH,
     },
@@ -333,7 +295,6 @@ async function main() {
       destinationLng: 67.0000,
       status: RideRequestStatus.WAITING_DRIVER_ACCEPT,
       ambulanceId: amb2.id,
-      hospitalId: hospital1.id,
       etaMinutes: 5,
       paymentMethod: PaymentMethod.CARD,
     },
@@ -350,7 +311,6 @@ async function main() {
       status: RideRequestStatus.COMPLETED,
       assignedDriverId: driver2.id,
       ambulanceId: amb1.id,
-      hospitalId: hospital1.id,
       etaMinutes: 3,
       completedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
       paymentMethod: PaymentMethod.CASH,

@@ -17,7 +17,7 @@ export class OrganizationsService {
       : {};
     return this.prisma.organization.findMany({
       where,
-      include: { _count: { select: { ambulances: true, hospitals: true } } },
+      include: { _count: { select: { ambulances: true } } },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -25,7 +25,7 @@ export class OrganizationsService {
   async findOne(id: string) {
     const org = await this.prisma.organization.findUnique({
       where: { id },
-      include: { ambulances: true, hospitals: true },
+      include: { ambulances: true },
     });
     if (!org) throw new NotFoundException('Organization not found');
     return org;

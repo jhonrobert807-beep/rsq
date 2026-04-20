@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEnum, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsNumber, IsUUID } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { AmbulanceType, AmbulanceStatus } from '@prisma/client';
 
@@ -27,4 +27,9 @@ export class UpdateAmbulanceDto {
   @IsOptional()
   @IsNumber()
   currentLng?: number;
+
+  @ApiPropertyOptional({ description: 'Organization ID' })
+  @IsOptional()
+  @IsUUID()
+  organizationId?: string;
 }

@@ -1,8 +1,12 @@
-import { IsEnum, IsNumber, IsOptional } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsUUID } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AmbulanceType } from '@prisma/client';
 
-export class CreateRideRequestDto {
+export class AdminCreateRideRequestDto {
+  @ApiProperty({ description: 'Patient user ID (role=USER)' })
+  @IsUUID()
+  userId: string;
+
   @ApiProperty({ enum: AmbulanceType, default: AmbulanceType.BASIC })
   @IsEnum(AmbulanceType)
   ambulanceType: AmbulanceType;
@@ -15,12 +19,12 @@ export class CreateRideRequestDto {
   @IsNumber()
   pickupLng: number;
 
-  @ApiPropertyOptional({ example: 24.8700 })
+  @ApiPropertyOptional({ example: 24.87 })
   @IsOptional()
   @IsNumber()
   destinationLat?: number;
 
-  @ApiPropertyOptional({ example: 67.0200 })
+  @ApiPropertyOptional({ example: 67.02 })
   @IsOptional()
   @IsNumber()
   destinationLng?: number;

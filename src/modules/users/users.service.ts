@@ -43,6 +43,7 @@ export class UsersService {
         passwordHash,
         role: dto.role ?? Role.USER,
         verified: dto.verified ?? false,
+        ...(dto.isActive !== undefined && { isActive: dto.isActive }),
       },
       select: userSelect,
     });
