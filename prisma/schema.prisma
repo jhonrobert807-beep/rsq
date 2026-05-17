@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 //
@@ -326,4 +327,15 @@ model AdminAction {
   createdAt DateTime @default(now())
 
   @@index([adminId, createdAt])
+}
+
+model OtpCode {
+  id         String   @id @default(uuid()) @db.Uuid
+  identifier String
+  code       String
+  expiresAt  DateTime
+  used       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([identifier])
 }

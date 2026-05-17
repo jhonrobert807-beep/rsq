@@ -17,6 +17,8 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { SendOtpDto } from './dto/send-otp.dto';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 
@@ -49,6 +51,20 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid or expired refresh token' })
   refresh(@Body() dto: RefreshTokenDto) {
     return this.authService.refreshTokens(dto.refreshToken);
+  }
+
+  @Post('send-otp')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Send OTP to email or phone (dev: code returned in response)' })
+  sendOtp(@Body() dto: SendOtpDto) {
+    return this.authService.sendOtp(dto);
+  }
+
+  @Post('verify-otp')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify OTP code' })
+  verifyOtp(@Body() dto: VerifyOtpDto) {
+    return this.authService.verifyOtp(dto);
   }
 
   @Get('profile')

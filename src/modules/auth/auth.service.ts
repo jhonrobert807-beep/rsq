@@ -12,6 +12,8 @@ import { Role } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { SendOtpDto } from './dto/send-otp.dto';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { JwtPayload } from './strategies/jwt.strategy';
 
 const SALT_ROUNDS = 10;
@@ -174,6 +176,46 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async sendOtp(dto: SendOtpDto) {
+    const code = Math.floor(10000 + Math.random() * 90000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    await this.prisma.otpCode.create({
+      data: { identifier: dto.identifier, code, expiresAt },
+    });
+
+    // In production: send via SMS/email. For dev, return code in response.
+    return { message: 'OTP sent', code };
+  }
+
+  async verifyOtp(dto: VerifyOtpDto) {
+    const otp = await this.prisma.otpCode.findFirst({
+      where: {
+        identifier: dto.identifier,
+        code: dto.code,
+        used: false,
+        expiresAt: { gt: new Date() },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!otp) {
+      throw new BadRequestException('Invalid or expired OTP');
+    }
+
+    await this.prisma.otpCode.update({ where: { id: otp.id }, data: { used: true } });
+
+    // Mark user as verified if they exist
+    await this.prisma.user.updateMany({
+      where: {
+        OR: [{ email: dto.identifier }, { phone: dto.identifier }],
+      },
+      data: { verified: true },
+    });
+
+    return { verified: true };
   }
 
   private async generateTokens(
