@@ -15,6 +15,11 @@ async function bootstrap() {
   );
   app.use(compression());
 
+  app.enableCors({
+    origin: '*',
+    credentials: true,
+  });
+
   app.setGlobalPrefix('api');
 
   app.useGlobalPipes(
