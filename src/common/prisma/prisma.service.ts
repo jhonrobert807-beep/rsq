@@ -11,7 +11,11 @@ export class PrismaService
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
-    const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+    const isProduction = process.env.NODE_ENV === 'production';
+    const pool = new pg.Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: isProduction ? { rejectUnauthorized: false } : false,
+    });
     const adapter = new PrismaPg(pool);
     super({ adapter });
   }
