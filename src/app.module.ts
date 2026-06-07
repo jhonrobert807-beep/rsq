@@ -22,7 +22,7 @@ import { AdminStatsModule } from './modules/admin-stats/admin-stats.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'admin'),
+      rootPath: join(__dirname, '..', 'admin'),
       serveRoot: '/admin',
     }),
     ConfigModule, CommonModule, AuthModule, UsersModule, OrganizationsModule, AmbulancesModule, RideRequestsModule, DispatchModule, TrackingModule, ChatsModule, AdminActionsModule, DriverPerformanceModule, ParamedicProfilesModule, DriverProfilesModule, AdminStatsModule],
