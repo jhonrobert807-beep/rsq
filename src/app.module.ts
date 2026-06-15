@@ -18,6 +18,9 @@ import { DriverPerformanceModule } from './modules/driver-performance/driver-per
 import { ParamedicProfilesModule } from './modules/paramedic-profiles/paramedic-profiles.module';
 import { DriverProfilesModule } from './modules/driver-profiles/driver-profiles.module';
 import { AdminStatsModule } from './modules/admin-stats/admin-stats.module';
+import { PasswordResetModule } from './modules/password-reset/password-reset.module';
+import { LanguageModule } from './modules/language/language.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -25,7 +28,7 @@ import { AdminStatsModule } from './modules/admin-stats/admin-stats.module';
       rootPath: join(__dirname, '..', 'admin'),
       serveRoot: '/admin',
     }),
-    ConfigModule, CommonModule, AuthModule, UsersModule, OrganizationsModule, AmbulancesModule, RideRequestsModule, DispatchModule, TrackingModule, ChatsModule, AdminActionsModule, DriverPerformanceModule, ParamedicProfilesModule, DriverProfilesModule, AdminStatsModule],
+    ConfigModule, CommonModule, AuthModule, UsersModule, OrganizationsModule, AmbulancesModule, RideRequestsModule, DispatchModule, TrackingModule, ChatsModule, AdminActionsModule, DriverPerformanceModule, ParamedicProfilesModule, DriverProfilesModule, AdminStatsModule, PasswordResetModule, LanguageModule, NotificationsModule],
   controllers: [AppController],
   providers: [AppService],
 })
