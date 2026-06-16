@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../common/prisma/prisma.service';
 import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { VerifyResetCodeDto } from './dto/verify-reset-code.dto';
 import { CompletePasswordResetDto } from './dto/complete-password-reset.dto';

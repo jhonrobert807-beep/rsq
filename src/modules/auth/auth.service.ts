@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { EmailService } from '../../services/email.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { SendOtpDto } from './dto/send-otp.dto';
@@ -24,6 +25,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly emailService: EmailService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -179,6 +181,18 @@ export class AuthService {
   }
 
   async sendOtp(dto: SendOtpDto) {
+    // Check rate limiting - max 1 OTP request per minute
+    const recentOtp = await this.prisma.otpCode.findFirst({
+      where: {
+        identifier: dto.identifier,
+        createdAt: { gt: new Date(Date.now() - 60 * 1000) }, // Last 1 minute
+      },
+    });
+
+    if (recentOtp) {
+      throw new BadRequestException('Please wait before requesting a new OTP');
+    }
+
     const code = Math.floor(10000 + Math.random() * 90000).toString();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
@@ -186,11 +200,31 @@ export class AuthService {
       data: { identifier: dto.identifier, code, expiresAt },
     });
 
-    // In production: send via SMS/email. For dev, return code in response.
-    return { message: 'OTP sent', code };
+    // Send OTP via email if identifier looks like email
+    if (dto.identifier.includes('@')) {
+      await this.emailService.sendOtpEmail(dto.identifier, code);
+    } else {
+      // For phone numbers, log for now (SMS not implemented yet)
+      console.log(`OTP for ${dto.identifier}: ${code}`);
+    }
+
+    return { message: 'OTP sent successfully. Check your email for the verification code.' };
   }
 
   async verifyOtp(dto: VerifyOtpDto) {
+    // Brute force protection - check for failed attempts in last 15 minutes
+    const failedAttempts = await this.prisma.otpCode.count({
+      where: {
+        identifier: dto.identifier,
+        code: { not: dto.code }, // Count non-matching codes
+        expiresAt: { gt: new Date(Date.now() - 15 * 60 * 1000) }, // Last 15 minutes
+      },
+    });
+
+    if (failedAttempts >= 5) {
+      throw new BadRequestException('Too many failed attempts. Please request a new OTP and try again.');
+    }
+
     const otp = await this.prisma.otpCode.findFirst({
       where: {
         identifier: dto.identifier,

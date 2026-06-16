@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../common/prisma/prisma.service';
 import { UpdateNotificationPreferencesDto } from './dto/update-notification-preferences.dto';
 
 @Injectable()
