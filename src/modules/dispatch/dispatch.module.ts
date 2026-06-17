@@ -1,13 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ScheduleModule } from '@nestjs/schedule';
-import { DispatchService } from './dispatch.service';
 import { DispatchController } from './dispatch.controller';
-import { DispatchTimeoutService } from './dispatch-timeout.service';
+import { DispatchService } from './dispatch.service';
 
 @Module({
-  imports: [ScheduleModule.forRoot()],
   controllers: [DispatchController],
-  providers: [DispatchService, DispatchTimeoutService],
+  providers: [DispatchService],
   exports: [DispatchService],
 })
 export class DispatchModule {}
