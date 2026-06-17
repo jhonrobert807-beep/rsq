@@ -372,7 +372,12 @@ export class RideRequestsService {
 
   async getDriverRides(driverId: string) {
     return this.prisma.rideRequest.findMany({
-      where: { assignedDriverId: driverId },
+      where: {
+        OR: [
+          { assignedDriverId: driverId },
+          { assignedParamedicId: driverId },
+        ],
+      },
       include: this.include,
       orderBy: { requestedAt: 'desc' },
     });
