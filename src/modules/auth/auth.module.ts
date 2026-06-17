@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { RolesGuard } from './guards/roles.guard';
 import { EmailService } from '../../services/email.service';
+import { SmsService } from '../../services/sms.service';
 import { DriverProfilesService } from '../driver-profiles/driver-profiles.service';
 import { ParamedicProfilesService } from '../paramedic-profiles/paramedic-profiles.service';
 
@@ -15,7 +16,7 @@ import { ParamedicProfilesService } from '../paramedic-profiles/paramedic-profil
     JwtModule.register({}),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, RolesGuard, EmailService, DriverProfilesService, ParamedicProfilesService],
+  providers: [AuthService, JwtStrategy, RolesGuard, EmailService, SmsService, DriverProfilesService, ParamedicProfilesService],
   exports: [AuthService, JwtStrategy, RolesGuard],
 })
 export class AuthModule {}

@@ -11,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { EmailService } from '../../services/email.service';
+import { SmsService } from '../../services/sms.service';
 import { DriverProfilesService } from '../driver-profiles/driver-profiles.service';
 import { ParamedicProfilesService } from '../paramedic-profiles/paramedic-profiles.service';
 import { RegisterDto } from './dto/register.dto';
@@ -28,6 +29,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly emailService: EmailService,
+    private readonly smsService: SmsService,
     private readonly driverProfilesService: DriverProfilesService,
     private readonly paramedicProfilesService: ParamedicProfilesService,
   ) {}
@@ -226,15 +228,41 @@ export class AuthService {
       data: { identifier: dto.identifier, code, expiresAt },
     });
 
-    // Send OTP via email if identifier looks like email
-    if (dto.identifier.includes('@')) {
+    const isEmail = dto.identifier.includes('@');
+    const isPhone = !isEmail && /^\d/.test(dto.identifier);
+
+    // Determine delivery channels
+    let sentEmail = false;
+    let sentSms = false;
+
+    // If identifier is email, send via email
+    if (isEmail) {
       await this.emailService.sendOtpEmail(dto.identifier, code);
-    } else {
-      // For phone numbers, log for now (SMS not implemented yet)
-      console.log(`OTP for ${dto.identifier}: ${code}`);
+      sentEmail = true;
     }
 
-    return { message: 'OTP sent successfully. Check your email for the verification code.' };
+    // If identifier is phone, send via SMS
+    if (isPhone) {
+      await this.smsService.sendOtp(dto.identifier, code);
+      sentSms = true;
+    }
+
+    // If no delivery method worked, throw error
+    if (!sentEmail && !sentSms) {
+      throw new BadRequestException('Invalid identifier - provide email or phone number');
+    }
+
+    // Build response message based on what was sent
+    let message = 'OTP sent successfully.';
+    if (sentEmail && sentSms) {
+      message = 'OTP sent to both email and phone number.';
+    } else if (sentEmail) {
+      message = 'OTP sent to your email.';
+    } else if (sentSms) {
+      message = 'OTP sent to your phone number.';
+    }
+
+    return { message };
   }
 
   async verifyOtp(dto: VerifyOtpDto) {
