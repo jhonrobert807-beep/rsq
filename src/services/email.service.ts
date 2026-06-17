@@ -49,6 +49,7 @@ export class EmailService {
       }
     } catch (error) {
       console.error('Brevo email error:', error.message);
+      console.error('Brevo response:', error.response?.status, error.response?.data);
       throw new BadRequestException('Failed to send OTP email. Please try again.');
     }
   }

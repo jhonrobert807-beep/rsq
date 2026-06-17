@@ -300,6 +300,14 @@ model DriverProfile {
   status          RegistrationStatus @default(PENDING)
   notes           String?
 
+  // Vehicle Information
+  vehicleOwner          String?
+  vehicleRegistrationNumber String?
+  vehicleType           String?
+  vehicleCity           String?
+  gender                String?
+  country               String?
+
   verifiedAt DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt

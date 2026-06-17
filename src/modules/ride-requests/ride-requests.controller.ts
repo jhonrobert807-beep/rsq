@@ -56,8 +56,8 @@ export class RideRequestsController {
   }
 
   @Get('driver-rides')
-  @Roles(Role.DRIVER)
-  @ApiOperation({ summary: 'Get rides assigned to me (Driver)' })
+  @Roles(Role.DRIVER, Role.PARAMEDIC)
+  @ApiOperation({ summary: 'Get rides assigned to me (Driver/Paramedic)' })
   getDriverRides(@CurrentUser() user: any) {
     return this.service.getDriverRides(user.id);
   }
@@ -86,15 +86,15 @@ export class RideRequestsController {
   }
 
   @Patch(':id/accept')
-  @Roles(Role.DRIVER)
-  @ApiOperation({ summary: 'Driver accepts a ride request' })
+  @Roles(Role.DRIVER, Role.PARAMEDIC)
+  @ApiOperation({ summary: 'Driver/Paramedic accepts a ride request' })
   acceptRide(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: any) {
     return this.service.acceptRide(id, user.id);
   }
 
   @Patch(':id/reject')
-  @Roles(Role.DRIVER)
-  @ApiOperation({ summary: 'Driver rejects a ride request' })
+  @Roles(Role.DRIVER, Role.PARAMEDIC)
+  @ApiOperation({ summary: 'Driver/Paramedic rejects a ride request' })
   rejectRide(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: any) {
     return this.service.rejectRide(id, user.id);
   }

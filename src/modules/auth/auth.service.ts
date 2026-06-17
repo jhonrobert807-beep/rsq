@@ -11,6 +11,8 @@ import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { EmailService } from '../../services/email.service';
+import { DriverProfilesService } from '../driver-profiles/driver-profiles.service';
+import { ParamedicProfilesService } from '../paramedic-profiles/paramedic-profiles.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { SendOtpDto } from './dto/send-otp.dto';
@@ -26,6 +28,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly emailService: EmailService,
+    private readonly driverProfilesService: DriverProfilesService,
+    private readonly paramedicProfilesService: ParamedicProfilesService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -77,6 +81,28 @@ export class AuthService {
         createdAt: true,
       },
     });
+
+    // Auto-create driver or paramedic profile
+    if (user.role === Role.DRIVER) {
+      try {
+        await this.driverProfilesService.create({
+          userId: user.id,
+          licenseNumber: '',
+          experienceYears: 0,
+        });
+      } catch (e) {
+        console.error('Failed to create driver profile:', e);
+      }
+    } else if (user.role === Role.PARAMEDIC) {
+      try {
+        await this.paramedicProfilesService.create({
+          userId: user.id,
+          experienceYears: 0,
+        });
+      } catch (e) {
+        console.error('Failed to create paramedic profile:', e);
+      }
+    }
 
     const tokens = await this.generateTokens(user.id, user.email, user.role);
 

@@ -16,8 +16,16 @@ async function bootstrap() {
   app.use(compression());
 
   app.enableCors({
-    origin: '*',
+    origin: (origin, callback) => {
+      if (!origin || origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) {
+        callback(null, true);
+      } else {
+        callback(null, true); // Allow all for now
+      }
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   app.setGlobalPrefix('api');

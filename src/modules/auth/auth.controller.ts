@@ -6,6 +6,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,18 +22,35 @@ import { SendOtpDto } from './dto/send-otp.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { EmailService } from '../../services/email.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly emailService: EmailService,
+  ) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user (USER, DRIVER, or PARAMEDIC)' })
   @ApiResponse({ status: 201, description: 'User registered successfully' })
   @ApiResponse({ status: 409, description: 'Email or phone already in use' })
-  register(@Body() dto: RegisterDto) {
-    return this.authService.register(dto);
+  async register(@Body() dto: RegisterDto) {
+    const result = await this.authService.register(dto);
+
+    // Auto-send OTP after registration
+    const identifier = dto.email || dto.phone;
+    if (identifier) {
+      try {
+        await this.authService.sendOtp({ identifier });
+      } catch (e) {
+        console.error('Failed to send OTP after registration:', e);
+        // Don't throw - registration succeeded, just OTP send failed
+      }
+    }
+
+    return result;
   }
 
   @Post('login')
@@ -75,5 +93,16 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   getProfile(@CurrentUser('id') userId: string) {
     return this.authService.getProfile(userId);
+  }
+
+  @Post('test-email')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Test email sending (dev only)' })
+  async testEmail(@Query('email') email: string) {
+    if (!email) {
+      return { error: 'Email parameter is required' };
+    }
+    await this.emailService.sendOtpEmail(email, '12345');
+    return { success: true, message: `Test email sent to ${email}` };
   }
 }

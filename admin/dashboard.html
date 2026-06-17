@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ResQLink Admin — Dashboard</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     :root {
       --primary: #dc2626;
@@ -55,302 +60,693 @@
     }
 
     .sidebar-logo .icon {
-      width: 36px; height: 36px;
+      width: 36px;
+      height: 36px;
       background: var(--primary);
       border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; font-weight: 700; color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
     }
 
-    .sidebar-logo h2 { font-size: 16px; letter-spacing: -0.3px; }
-    .sidebar-logo h2 span { color: var(--primary); }
+    .sidebar-logo h2 {
+      font-size: 16px;
+      letter-spacing: -0.3px;
+    }
 
-    .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+    .sidebar-logo h2 span {
+      color: var(--primary);
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+      overflow-y: auto;
+    }
 
     .nav-section {
-      font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
-      color: var(--text-muted); padding: 8px 12px 6px; margin-top: 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      padding: 8px 12px 6px;
+      margin-top: 8px;
     }
 
     .nav-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 9px 12px; border-radius: 8px; font-size: 14px;
-      color: var(--text-muted); text-decoration: none; cursor: pointer;
-      transition: all 0.15s; border: none; background: none; width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--text-muted);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      background: none;
+      width: 100%;
     }
 
-    .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
-    .nav-item.active { background: var(--primary-light); color: var(--primary); }
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+    }
 
-    .nav-icon { width: 20px; height: 20px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .nav-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
 
-    .sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--card-border); }
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-    .user-info { display: flex; align-items: center; gap: 10px; padding: 8px 12px; }
+    .nav-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .sidebar-footer {
+      padding: 16px 12px;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+    }
 
     .avatar {
-      width: 32px; height: 32px; background: var(--primary); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 600; color: #fff;
+      width: 32px;
+      height: 32px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
     }
 
-    .user-name { font-size: 13px; font-weight: 500; }
-    .user-role { font-size: 11px; color: var(--text-muted); }
+    .user-name {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .user-role {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
 
     .logout-btn {
-      display: flex; align-items: center; gap: 10px;
-      padding: 9px 12px; border-radius: 8px; font-size: 13px;
-      color: var(--text-muted); cursor: pointer; border: none;
-      background: none; width: 100%; transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      transition: all 0.15s;
     }
 
-    .logout-btn:hover { background: rgba(239,68,68,0.1); color: var(--error); }
+    .logout-btn:hover {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+    }
 
     /* ─── Main Content ─── */
-    .main { flex: 1; margin-left: 250px; padding: 24px 32px; min-height: 100vh; }
+    .main {
+      flex: 1;
+      margin-left: 250px;
+      padding: 24px 32px;
+      min-height: 100vh;
+    }
 
     .page-header {
-      display: flex; justify-content: space-between; align-items: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 24px;
     }
 
-    .page-header h1 { font-size: 22px; font-weight: 700; }
-    .page-header p { color: var(--text-muted); font-size: 14px; margin-top: 2px; }
+    .page-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .page-header p {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 2px;
+    }
 
     .badge {
-      padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
     }
 
     .badge-live {
-      background: rgba(34,197,94,0.15); color: var(--success);
-      display: flex; align-items: center; gap: 6px;
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .dot {
-      width: 7px; height: 7px; border-radius: 50%; background: var(--success);
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
       animation: pulse 1.5s infinite;
     }
 
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
+    }
 
     /* ─── Stats Grid ─── */
     .stats-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px; margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
     }
 
     .stat-card {
-      background: var(--card); border: 1px solid var(--card-border);
-      border-radius: 12px; padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
     }
 
-    .stat-card .label { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
-    .stat-card .value { font-size: 28px; font-weight: 700; }
-    .stat-card .sub { font-size: 12px; margin-top: 4px; color: var(--text-muted); }
+    .stat-card .label {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-card .value {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .stat-card .sub {
+      font-size: 12px;
+      margin-top: 4px;
+      color: var(--text-muted);
+    }
 
     /* ─── Table ─── */
     .table-section {
-      background: var(--card); border: 1px solid var(--card-border);
-      border-radius: 12px; overflow: hidden; margin-bottom: 20px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 20px;
     }
 
     .table-header {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 20px; border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--card-border);
     }
 
-    .table-header h3 { font-size: 15px; }
+    .table-header h3 {
+      font-size: 15px;
+    }
 
-    .table-actions { display: flex; gap: 8px; align-items: center; }
+    .table-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
 
-    table { width: 100%; border-collapse: collapse; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
 
     th {
-      text-align: left; padding: 10px 20px; font-size: 12px;
-      color: var(--text-muted); font-weight: 500; text-transform: uppercase;
-      letter-spacing: 0.3px; border-bottom: 1px solid var(--card-border);
+      text-align: left;
+      padding: 10px 20px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      border-bottom: 1px solid var(--card-border);
     }
 
     td {
-      padding: 12px 20px; font-size: 14px;
+      padding: 12px 20px;
+      font-size: 14px;
       border-bottom: 1px solid var(--card-border);
       vertical-align: middle;
     }
 
-    td:last-child { white-space: nowrap; }
-    td:last-child > button { margin-right: 4px; vertical-align: middle; }
-    td:last-child > button:last-child { margin-right: 0; }
-
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: rgba(255,255,255,0.02); }
-
-    .status-badge {
-      display: inline-block; padding: 3px 10px; border-radius: 20px;
-      font-size: 12px; font-weight: 500;
+    td:last-child {
+      white-space: nowrap;
     }
 
-    .status-available, .status-verified { background: rgba(34,197,94,0.15); color: var(--success); }
-    .status-busy, .status-dispatching, .status-pending, .status-waiting_driver_accept { background: rgba(245,158,11,0.15); color: var(--warning); }
-    .status-offline, .status-completed { background: rgba(148,163,184,0.15); color: var(--text-muted); }
-    .status-maintenance, .status-cancelled, .status-rejected, .status-failed_no_driver { background: rgba(239,68,68,0.15); color: var(--error); }
-    .status-created { background: rgba(59,130,246,0.15); color: var(--info); }
-    .status-in_trip, .status-driver_accepted, .status-driver_arrived { background: rgba(34,197,94,0.15); color: var(--success); }
+    td:last-child>button {
+      margin-right: 4px;
+      vertical-align: middle;
+    }
 
-    .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+    td:last-child>button:last-child {
+      margin-right: 0;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-available,
+    .status-verified {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+    }
+
+    .status-busy,
+    .status-dispatching,
+    .status-pending,
+    .status-waiting_driver_accept {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    .status-offline,
+    .status-completed {
+      background: rgba(148, 163, 184, 0.15);
+      color: var(--text-muted);
+    }
+
+    .status-maintenance,
+    .status-cancelled,
+    .status-rejected,
+    .status-failed_no_driver {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--error);
+    }
+
+    .status-created {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--info);
+    }
+
+    .status-in_trip,
+    .status-driver_accepted,
+    .status-driver_arrived {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
 
     /* ─── Buttons ─── */
     .btn {
-      padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
-      cursor: pointer; border: none; transition: all 0.15s; color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+      color: #fff;
     }
 
-    .btn-primary { background: var(--primary); }
-    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-primary {
+      background: var(--primary);
+    }
 
-    .btn-sm { padding: 5px 12px; font-size: 12px; line-height: 1.4; border: 1px solid transparent; }
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
 
-    .btn-success { background: var(--success); }
-    .btn-warning { background: var(--warning); color: #000; }
-    .btn-danger { background: var(--error); }
-    .btn-info { background: var(--info); }
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 12px;
+      line-height: 1.4;
+      border: 1px solid transparent;
+    }
+
+    .btn-success {
+      background: var(--success);
+    }
+
+    .btn-warning {
+      background: var(--warning);
+      color: #000;
+    }
+
+    .btn-danger {
+      background: var(--error);
+    }
+
+    .btn-info {
+      background: var(--info);
+    }
 
     .btn-outline {
-      background: transparent; border: 1px solid var(--card-border); color: var(--text);
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text);
     }
-    .btn-outline:hover { border-color: var(--text-muted); }
+
+    .btn-outline:hover {
+      border-color: var(--text-muted);
+    }
 
     .btn-icon {
-      padding: 5px 10px; background: transparent; border: 1px solid var(--card-border);
-      color: var(--text-muted); border-radius: 6px; cursor: pointer; font-size: 14px;
+      padding: 5px 10px;
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
       line-height: 1.4;
     }
-    .btn-icon:hover { color: var(--text); border-color: var(--text-muted); }
+
+    .btn-icon:hover {
+      color: var(--text);
+      border-color: var(--text-muted);
+    }
 
     /* ─── Forms / Modal ─── */
     .modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7); display: flex; align-items: center;
-      justify-content: center; z-index: 1000;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
     }
 
     .modal {
-      background: var(--sidebar); border: 1px solid var(--card-border);
-      border-radius: 12px; padding: 24px; width: 100%; max-width: 500px;
-      max-height: 90vh; overflow-y: auto;
+      background: var(--sidebar);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
-    .modal h2 { font-size: 18px; margin-bottom: 20px; }
+    .modal h2 {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
 
-    .form-group { margin-bottom: 16px; }
+    .form-group {
+      margin-bottom: 16px;
+    }
 
     .form-group label {
-      display: block; font-size: 13px; font-weight: 500;
-      color: var(--text-muted); margin-bottom: 6px;
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
     }
 
-    .form-group input, .form-group select, .form-group textarea {
-      width: 100%; padding: 10px 14px; background: var(--input-bg);
-      border: 1px solid var(--card-border); border-radius: 8px;
-      color: var(--text); font-size: 14px; outline: none; transition: border-color 0.2s;
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
     }
 
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
       border-color: var(--primary);
     }
 
-    .form-group input::placeholder, .form-group textarea::placeholder { color: #475569; }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: #475569;
+    }
 
-    .form-group select option { background: var(--sidebar); color: var(--text); }
+    .form-group select option {
+      background: var(--sidebar);
+      color: var(--text);
+    }
 
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
 
-    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
 
     /* ─── Filters ─── */
     .filters {
-      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
     .filter-select {
-      padding: 7px 12px; background: var(--input-bg); border: 1px solid var(--card-border);
-      border-radius: 8px; color: var(--text); font-size: 13px; outline: none;
+      padding: 7px 12px;
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
     }
 
-    .filter-select option { background: var(--sidebar); }
+    .filter-select option {
+      background: var(--sidebar);
+    }
 
     /* ─── Toast ─── */
     .toast-container {
-      position: fixed; top: 20px; right: 20px; z-index: 2000;
-      display: flex; flex-direction: column; gap: 8px;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     .toast {
-      padding: 12px 20px; border-radius: 8px; font-size: 14px;
-      font-weight: 500; animation: slideIn 0.3s ease;
-      min-width: 280px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      animation: slideIn 0.3s ease;
+      min-width: 280px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
-    .toast-success { background: #166534; color: #bbf7d0; }
-    .toast-error { background: #991b1b; color: #fecaca; }
-    .toast-info { background: #1e40af; color: #bfdbfe; }
+    .toast-success {
+      background: #166534;
+      color: #bbf7d0;
+    }
 
-    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .toast-error {
+      background: #991b1b;
+      color: #fecaca;
+    }
+
+    .toast-info {
+      background: #1e40af;
+      color: #bfdbfe;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
 
     /* ─── Loading ─── */
     .spinner-inline {
-      display: inline-block; width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
-      border-radius: 50%; animation: spin 0.6s linear infinite;
-      vertical-align: middle; margin-right: 6px;
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
-    .loading-row td { text-align: center; padding: 40px; color: var(--text-muted); }
+    .loading-row td {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
 
     /* ─── Tracking Map Placeholder ─── */
     .map-container {
-      background: var(--card); border: 1px solid var(--card-border);
-      border-radius: 12px; padding: 20px; margin-bottom: 20px;
-      min-height: 300px; position: relative;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      min-height: 300px;
+      position: relative;
     }
 
     .map-placeholder {
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 12px; min-height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 260px;
       color: var(--text-muted);
     }
 
     .ambulance-dot {
-      width: 12px; height: 12px; border-radius: 50%;
-      display: inline-block; margin-right: 6px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
     }
 
-    .dot-available { background: var(--success); }
-    .dot-busy { background: var(--warning); }
-    .dot-offline { background: var(--text-muted); }
-    .dot-maintenance { background: var(--error); }
+    .dot-available {
+      background: var(--success);
+    }
+
+    .dot-busy {
+      background: var(--warning);
+    }
+
+    .dot-offline {
+      background: var(--text-muted);
+    }
+
+    .dot-maintenance {
+      background: var(--error);
+    }
 
     /* ─── Detail Cards ─── */
     .detail-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px; margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
     }
 
     .detail-card {
-      background: var(--card); border: 1px solid var(--card-border);
-      border-radius: 12px; padding: 20px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
     }
 
-    .detail-card h4 { font-size: 14px; color: var(--text-muted); margin-bottom: 12px; }
+    .detail-card h4 {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
 
-    .detail-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
-    .detail-row .label { color: var(--text-muted); }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 14px;
+    }
 
-    .hidden { display: none !important; }
+    .detail-row .label {
+      color: var(--text-muted);
+    }
+
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
+
 <body>
   <!-- Sidebar -->
   <aside class="sidebar">
@@ -361,23 +757,79 @@
 
     <nav class="sidebar-nav" id="sidebarNav">
       <div class="nav-section">Overview</div>
-      <button class="nav-item active" data-page="dashboard"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></span> Dashboard</button>
+      <button class="nav-item active" data-page="dashboard"><span class="nav-icon"><svg viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="9" rx="1" />
+            <rect x="14" y="3" width="7" height="5" rx="1" />
+            <rect x="14" y="12" width="7" height="9" rx="1" />
+            <rect x="3" y="16" width="7" height="5" rx="1" />
+          </svg></span> Dashboard</button>
 
       <div class="nav-section">Management</div>
-      <button class="nav-item" data-page="users"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Users</button>
-      <button class="nav-item" data-page="ambulances"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 15h4l3-8h4l2 8h5"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/><path d="M1 15h1m20 0h1"/><rect x="5" y="7" width="10" height="8" rx="1"/><path d="M15 7h2l3 4v4h-5"/><path d="M7 11h4"/><path d="M9 9v4"/></svg></span> Ambulances</button>
-      <button class="nav-item" data-page="organizations"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/></svg></span> Organizations</button>
-      <button class="nav-item" data-page="paramedics"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6 6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg></span> Paramedic Profiles</button>
-      <button class="nav-item" data-page="drivers"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5 22v-3a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v3"/><path d="M9 11h6"/></svg></span> Driver Profiles</button>
+      <button class="nav-item" data-page="users"><span class="nav-icon"><svg viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg></span> Users</button>
+      <button class="nav-item" data-page="ambulances"><span class="nav-icon"><svg viewBox="0 0 24 24">
+            <path d="M3 15h4l3-8h4l2 8h5" />
+            <circle cx="7" cy="18" r="2" />
+            <circle cx="17" cy="18" r="2" />
+            <path d="M1 15h1m20 0h1" />
+            <rect x="5" y="7" width="10" height="8" rx="1" />
+            <path d="M15 7h2l3 4v4h-5" />
+            <path d="M7 11h4" />
+            <path d="M9 9v4" />
+          </svg></span> Ambulances</button>
+      <button class="nav-item" data-page="organizations"><span class="nav-icon"><svg viewBox="0 0 24 24">
+            <path d="M3 21h18" />
+            <path d="M5 21V7l8-4v18" />
+            <path d="M19 21V11l-6-4" />
+            <path d="M9 9h1" />
+            <path d="M9 13h1" />
+            <path d="M9 17h1" />
+          </svg></span> Organizations</button>
+      <button class="nav-item" data-page="paramedics"><span class="nav-icon"><svg viewBox="0 0 24 24">
+            <path
+              d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3" />
+            <path d="M8 15v1a6 6 0 0 0 6 6 6 6 0 0 0 6-6v-4" />
+            <circle cx="20" cy="10" r="2" />
+          </svg></span> Paramedic Profiles</button>
+      <button class="nav-item" data-page="drivers"><span class="nav-icon"><svg viewBox="0 0 24 24">
+            <circle cx="12" cy="7" r="4" />
+            <path d="M5 22v-3a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v3" />
+            <path d="M9 11h6" />
+          </svg></span> Driver Profiles</button>
 
       <div class="nav-section">Operations</div>
-      <button class="nav-item" data-page="rides"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span> Ride Requests</button>
-      <button class="nav-item" data-page="tracking"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span> Live Tracking</button>
-      <button class="nav-item" data-page="dispatch"><span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></span> Dispatch</button>
+      <button class="nav-item" data-page="rides"><span class="nav-icon"><svg viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+            <path d="M2 17l10 5 10-5" />
+            <path d="M2 12l10 5 10-5" />
+          </svg></span> Ride Requests</button>
+      <button class="nav-item" data-page="tracking"><span class="nav-icon"><svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" />
+            <circle cx="12" cy="12" r="6" />
+            <circle cx="12" cy="12" r="2" />
+          </svg></span> Live Tracking</button>
+      <button class="nav-item" data-page="dispatch"><span class="nav-icon"><svg viewBox="0 0 24 24">
+            <line x1="22" y1="2" x2="11" y2="13" />
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg></span> Dispatch</button>
 
       <div class="nav-section">Monitoring</div>
-      <button class="nav-item" data-page="performance"><span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> Driver Performance</button>
-      <button class="nav-item" data-page="auditlog"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span> Audit Log</button>
+      <button class="nav-item" data-page="performance"><span class="nav-icon"><svg viewBox="0 0 24 24">
+            <line x1="18" y1="20" x2="18" y2="10" />
+            <line x1="12" y1="20" x2="12" y2="4" />
+            <line x1="6" y1="20" x2="6" y2="14" />
+          </svg></span> Driver Performance</button>
+      <button class="nav-item" data-page="auditlog"><span class="nav-icon"><svg viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+            <polyline points="10 9 9 9 8 9" />
+          </svg></span> Audit Log</button>
     </nav>
 
     <div class="sidebar-footer">
@@ -389,7 +841,11 @@
         </div>
       </div>
       <button class="logout-btn" id="logoutBtn">
-        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span> Sign out
+        <span class="nav-icon"><svg viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg></span> Sign out
       </button>
     </div>
   </aside>
@@ -404,7 +860,7 @@
     // ═══════════════════════════════════════════════════════════════
     // CORE: Auth, API, Router
     // ═══════════════════════════════════════════════════════════════
-    const API = 'https://resqlinkbackend-production.up.railway.app/api';
+    const API = 'http://localhost:3001/api';
     const token = localStorage.getItem('accessToken');
     const user = JSON.parse(localStorage.getItem('user') || 'null');
 
@@ -556,8 +1012,8 @@
         if (!ambulances) return;
 
         const available = ambulances.filter(a => a.status === 'AVAILABLE');
-        const pending = rides.filter(r => ['CREATED','DISPATCHING','WAITING_DRIVER_ACCEPT'].includes(r.status));
-        const active = rides.filter(r => ['DRIVER_ACCEPTED','DRIVER_ARRIVED','IN_TRIP'].includes(r.status));
+        const pending = rides.filter(r => ['CREATED', 'DISPATCHING', 'WAITING_DRIVER_ACCEPT'].includes(r.status));
+        const active = rides.filter(r => ['DRIVER_ACCEPTED', 'DRIVER_ARRIVED', 'IN_TRIP'].includes(r.status));
         const verified = paramedics.filter(p => p.status === 'VERIFIED');
 
         document.getElementById('s-amb').textContent = available.length;
@@ -624,7 +1080,7 @@
       `;
 
       let allOrgs = [];
-      try { allOrgs = await apiFetch('/organizations') || []; } catch(e) {}
+      try { allOrgs = await apiFetch('/organizations') || []; } catch (e) { }
 
       async function loadAmbulances() {
         const status = document.getElementById('ambStatusFilter').value;
@@ -668,7 +1124,7 @@
       async function showAmbModal(id) {
         let amb = null;
         if (id) {
-          try { amb = await apiFetch(`/ambulances/${id}`); } catch(e) { return toast('Ambulance not found', 'error'); }
+          try { amb = await apiFetch(`/ambulances/${id}`); } catch (e) { return toast('Ambulance not found', 'error'); }
         }
         const overlay = document.createElement('div');
         overlay.className = 'modal-overlay';
@@ -832,7 +1288,7 @@
 
       async function showParaModal() {
         let users = [];
-        try { users = await apiFetch('/users') || []; } catch(e) {}
+        try { users = await apiFetch('/users') || []; } catch (e) { }
         const paramedicUsers = users.filter(u => u.role === 'PARAMEDIC');
 
         const overlay = document.createElement('div');
@@ -979,7 +1435,7 @@
 
       async function showDrvModal() {
         let users = [];
-        try { users = await apiFetch('/users?role=DRIVER') || []; } catch(e) {}
+        try { users = await apiFetch('/users?role=DRIVER') || []; } catch (e) { }
 
         const overlay = document.createElement('div');
         overlay.className = 'modal-overlay';
@@ -1115,12 +1571,12 @@
             <td>${fmtDate(r.requestedAt)}</td>
             <td>
               <button class="btn-icon" data-view-ride="${r.id}" title="View">&#128065;</button>
-              ${['CREATED','DISPATCHING','WAITING_DRIVER_ACCEPT'].includes(r.status) ?
-                `<button class="btn btn-sm btn-danger" data-cancel-ride="${r.id}">Cancel</button>` : ''}
+              ${['CREATED', 'DISPATCHING', 'WAITING_DRIVER_ACCEPT'].includes(r.status) ?
+              `<button class="btn btn-sm btn-danger" data-cancel-ride="${r.id}">Cancel</button>` : ''}
               ${r.status === 'CREATED' ?
-                `<button class="btn btn-sm btn-info" data-dispatch-ride="${r.id}" data-amb-type="${r.ambulanceType}">Dispatch</button>` : ''}
-              ${['WAITING_DRIVER_ACCEPT','DRIVER_ACCEPTED','DISPATCHING'].includes(r.status) ?
-                `<button class="btn btn-sm btn-warning" data-reassign-ride="${r.id}">Reassign</button>` : ''}
+              `<button class="btn btn-sm btn-info" data-dispatch-ride="${r.id}" data-amb-type="${r.ambulanceType}">Dispatch</button>` : ''}
+              ${['WAITING_DRIVER_ACCEPT', 'DRIVER_ACCEPTED', 'DISPATCHING'].includes(r.status) ?
+              `<button class="btn btn-sm btn-warning" data-reassign-ride="${r.id}">Reassign</button>` : ''}
             </td>
           </tr>`).join('');
         } catch (e) { toast('Failed to load rides', 'error'); }
@@ -1131,7 +1587,7 @@
 
       async function showNewRideModal() {
         let patients = [];
-        try { patients = await apiFetch('/users?role=USER') || []; } catch(e) {}
+        try { patients = await apiFetch('/users?role=USER') || []; } catch (e) { }
         const overlay = document.createElement('div');
         overlay.className = 'modal-overlay';
         overlay.id = 'newRideModal';
@@ -1479,7 +1935,7 @@
           sel.innerHTML = '<option value="">Select a ride...</option>' +
             rides.map(r => `<option value="${r.id}" data-type="${r.ambulanceType}">${r.user?.name || 'Unknown'} — ${r.ambulanceType} — ${fmtGps(r.pickupLat, r.pickupLng)}</option>`).join('');
         }
-      } catch(e) {}
+      } catch (e) { }
 
       // Auto dispatch
       document.getElementById('dispatchBtn').addEventListener('click', async () => {
@@ -1606,7 +2062,7 @@
 
       async function editPerf(driverId, name) {
         let perf;
-        try { perf = await apiFetch(`/driver-performance/${driverId}`); } catch(e) { return toast(e.message, 'error'); }
+        try { perf = await apiFetch(`/driver-performance/${driverId}`); } catch (e) { return toast(e.message, 'error'); }
         const overlay = document.createElement('div');
         overlay.className = 'modal-overlay';
         overlay.id = 'perfModal';
@@ -1977,4 +2433,5 @@
     navigate('dashboard');
   </script>
 </body>
+
 </html>
