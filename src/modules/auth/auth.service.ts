@@ -18,7 +18,9 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { SendOtpDto } from './dto/send-otp.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { GoogleLoginDto } from './dto/google-login.dto';
 import { JwtPayload } from './strategies/jwt.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 const SALT_ROUNDS = 10;
 
@@ -32,6 +34,7 @@ export class AuthService {
     private readonly smsService: SmsService,
     private readonly driverProfilesService: DriverProfilesService,
     private readonly paramedicProfilesService: ParamedicProfilesService,
+    private readonly googleStrategy: GoogleStrategy,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -154,6 +157,82 @@ export class AuthService {
       },
       ...tokens,
     };
+  }
+
+  async googleLogin(dto: GoogleLoginDto) {
+    try {
+      // Verify Google ID token
+      const payload = await this.googleStrategy.verifyIdToken(dto.idToken);
+
+      if (!payload || !payload.email) {
+        throw new BadRequestException('Email not provided by Google');
+      }
+
+      // Find existing user by email
+      let user = await this.prisma.user.findUnique({
+        where: { email: payload.email },
+      });
+
+      // If user doesn't exist, create new user
+      if (!user) {
+        const role = dto.role ?? Role.USER;
+
+        user = await this.prisma.user.create({
+          data: {
+            name: payload.name || payload.email.split('@')[0],
+            email: payload.email,
+            role,
+            verified: true,
+            passwordHash: '', // No password for Google login
+          },
+        });
+
+        // Auto-create driver or paramedic profile
+        if (user.role === Role.DRIVER) {
+          try {
+            await this.driverProfilesService.create({
+              userId: user.id,
+              licenseNumber: '',
+              experienceYears: 0,
+            });
+          } catch (e) {
+            console.error('Failed to create driver profile:', e);
+          }
+        } else if (user.role === Role.PARAMEDIC) {
+          try {
+            await this.paramedicProfilesService.create({
+              userId: user.id,
+              experienceYears: 0,
+            });
+          } catch (e) {
+            console.error('Failed to create paramedic profile:', e);
+          }
+        }
+      }
+
+      if (!user.isActive) {
+        throw new UnauthorizedException('Account has been deactivated');
+      }
+
+      const tokens = await this.generateTokens(user.id, user.email, user.role);
+
+      return {
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+          verified: user.verified,
+        },
+        ...tokens,
+      };
+    } catch (error) {
+      if (error instanceof UnauthorizedException || error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new UnauthorizedException('Google login failed');
+    }
   }
 
   async refreshTokens(refreshToken: string) {

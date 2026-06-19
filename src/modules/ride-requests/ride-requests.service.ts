@@ -49,12 +49,26 @@ export class RideRequestsService {
   }
 
   async create(userId: string, dto: CreateRideRequestDto) {
+    const data: any = {
+      userId,
+      ...dto,
+      status: RideRequestStatus.CREATED,
+    };
+
+    // Calculate estimated fare and distance upfront
+    if (dto.pickupLat && dto.pickupLng && dto.destinationLat && dto.destinationLng) {
+      const distanceKm = this.haversineDistance(
+        dto.pickupLat,
+        dto.pickupLng,
+        dto.destinationLat,
+        dto.destinationLng,
+      );
+      data.distanceKm = Math.round(distanceKm * 100) / 100;
+      data.cost = this.calculateFare(distanceKm, dto.ambulanceType);
+    }
+
     return this.prisma.rideRequest.create({
-      data: {
-        userId,
-        ...dto,
-        status: RideRequestStatus.CREATED,
-      },
+      data,
       include: this.include,
     });
   }
@@ -70,12 +84,26 @@ export class RideRequestsService {
     }
 
     const { userId, ...rest } = dto;
+    const data: any = {
+      userId,
+      ...rest,
+      status: RideRequestStatus.CREATED,
+    };
+
+    // Calculate estimated fare and distance upfront
+    if (rest.pickupLat && rest.pickupLng && rest.destinationLat && rest.destinationLng) {
+      const distanceKm = this.haversineDistance(
+        rest.pickupLat,
+        rest.pickupLng,
+        rest.destinationLat,
+        rest.destinationLng,
+      );
+      data.distanceKm = Math.round(distanceKm * 100) / 100;
+      data.cost = this.calculateFare(distanceKm, rest.ambulanceType);
+    }
+
     return this.prisma.rideRequest.create({
-      data: {
-        userId,
-        ...rest,
-        status: RideRequestStatus.CREATED,
-      },
+      data,
       include: this.include,
     });
   }
@@ -117,6 +145,18 @@ export class RideRequestsService {
     if (dto.ambulanceId) data.ambulanceId = dto.ambulanceId;
     if (dto.assignedDriverId) data.assignedDriverId = dto.assignedDriverId;
     if (dto.assignedParamedicId) data.assignedParamedicId = dto.assignedParamedicId;
+
+    // Calculate ETA when driver accepts ride
+    if (dto.status === RideRequestStatus.DRIVER_ACCEPTED) {
+      if (ride.pickupLat && ride.pickupLng && ride.destinationLat && ride.destinationLng) {
+        const distanceKm = this.haversineDistance(
+          ride.pickupLat, ride.pickupLng,
+          ride.destinationLat, ride.destinationLng,
+        );
+        const avgSpeedKmh = 40;
+        data.etaMinutes = Math.ceil((distanceKm / avgSpeedKmh) * 60);
+      }
+    }
 
     if (dto.status === RideRequestStatus.COMPLETED) {
       data.completedAt = new Date();
@@ -215,13 +255,25 @@ export class RideRequestsService {
       },
     });
 
+    // Calculate ETA on acceptance
+    const updateData: any = {
+      status: RideRequestStatus.DRIVER_ACCEPTED,
+      assignedDriverId: driverId,
+      statusUpdatedAt: new Date(),
+    };
+
+    if (ride.pickupLat && ride.pickupLng && ride.destinationLat && ride.destinationLng) {
+      const distanceKm = this.haversineDistance(
+        ride.pickupLat, ride.pickupLng,
+        ride.destinationLat, ride.destinationLng,
+      );
+      const avgSpeedKmh = 40;
+      updateData.etaMinutes = Math.ceil((distanceKm / avgSpeedKmh) * 60);
+    }
+
     return this.prisma.rideRequest.update({
       where: { id },
-      data: {
-        status: RideRequestStatus.DRIVER_ACCEPTED,
-        assignedDriverId: driverId,
-        statusUpdatedAt: new Date(),
-      },
+      data: updateData,
       include: this.include,
     });
   }
