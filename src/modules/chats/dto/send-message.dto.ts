@@ -7,9 +7,10 @@ export class SendMessageDto {
   @IsUUID()
   rideRequestId: string;
 
-  @ApiProperty({ description: 'Receiver user ID' })
+  @ApiPropertyOptional({ description: 'Receiver user ID (omit for group chat)' })
+  @IsOptional()
   @IsUUID()
-  receiverId: string;
+  receiverId?: string;
 
   @ApiProperty({ example: 'Patient is conscious and breathing' })
   @IsString()

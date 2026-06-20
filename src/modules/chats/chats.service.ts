@@ -17,7 +17,7 @@ export class ChatsService {
       data: {
         rideRequestId: dto.rideRequestId,
         senderId,
-        receiverId: dto.receiverId,
+        receiverId: dto.receiverId ?? senderId,
         message: dto.message,
         messageType: dto.messageType ?? ChatMessageType.TEXT,
       },

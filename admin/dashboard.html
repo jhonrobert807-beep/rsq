@@ -1716,32 +1716,41 @@
 
       async function dispatchRide(id, type) {
         try {
-          // Step 1: Get available ambulances and drivers in parallel
-          const [ambulances, allUsers] = await Promise.all([
+          const isWithDoctor = type === 'WITH_DOCTOR';
+          const [ambulances, drivers, paramedics] = await Promise.all([
             apiFetch('/ambulances?status=AVAILABLE'),
             apiFetch('/users?role=DRIVER'),
+            isWithDoctor ? apiFetch('/users?role=PARAMEDIC') : Promise.resolve([]),
           ]);
           if (!ambulances || ambulances.length === 0) return toast('No available ambulances found', 'error');
-          if (!allUsers || allUsers.length === 0) return toast('No drivers available', 'error');
+          if (!drivers || drivers.length === 0) return toast('No drivers available', 'error');
 
-          // Step 2: Show selection modal
           const ambOptions = ambulances.map(a => `<option value="${a.id}">${a.registrationNumber} (${a.type})</option>`).join('');
-          const driverOptions = allUsers.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+          const driverOptions = drivers.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+          const paramedicSection = isWithDoctor ? `
+            <div class="form-group" style="margin-bottom:12px;">
+              <label>Select Paramedic <span style="color:#c00;">(required for WITH_DOCTOR)</span></label>
+              <select id="dispatchParamedicSelect" style="width:100%;padding:10px;background:var(--input-bg);border:1px solid var(--card-border);border-radius:8px;color:var(--text);margin-top:4px;">
+                <option value="">-- Select Paramedic --</option>
+                ${(paramedics || []).map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+              </select>
+            </div>` : '';
 
           const modal = document.createElement('div');
           modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;';
           modal.innerHTML = `
             <div style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:24px;width:360px;">
-              <h3 style="margin-bottom:16px;">Dispatch Ride</h3>
+              <h3 style="margin-bottom:16px;">Dispatch Ride${isWithDoctor ? ' <span style="color:#c00;font-size:13px;">(With Doctor)</span>' : ''}</h3>
               <div class="form-group" style="margin-bottom:12px;">
                 <label>Select Ambulance</label>
                 <select id="dispatchAmbSelect" style="width:100%;padding:10px;background:var(--input-bg);border:1px solid var(--card-border);border-radius:8px;color:var(--text);margin-top:4px;">${ambOptions}</select>
               </div>
-              <div class="form-group" style="margin-bottom:20px;">
+              <div class="form-group" style="margin-bottom:12px;">
                 <label>Select Driver</label>
                 <select id="dispatchDriverSelect" style="width:100%;padding:10px;background:var(--input-bg);border:1px solid var(--card-border);border-radius:8px;color:var(--text);margin-top:4px;">${driverOptions}</select>
               </div>
-              <div style="display:flex;gap:8px;">
+              ${paramedicSection}
+              <div style="display:flex;gap:8px;margin-top:8px;">
                 <button id="dispatchConfirmBtn" class="btn btn-primary" style="flex:1;">Dispatch</button>
                 <button id="dispatchCancelBtn" class="btn btn-danger" style="flex:1;">Cancel</button>
               </div>
@@ -1752,13 +1761,18 @@
           document.getElementById('dispatchConfirmBtn').onclick = async () => {
             const ambulanceId = document.getElementById('dispatchAmbSelect').value;
             const driverId = document.getElementById('dispatchDriverSelect').value;
+            const paramedicEl = document.getElementById('dispatchParamedicSelect');
+            const paramedicId = paramedicEl ? paramedicEl.value : '';
+            if (isWithDoctor && !paramedicId) return toast('Please select a paramedic for WITH_DOCTOR ride', 'error');
             const amb = ambulances.find(a => a.id === ambulanceId);
             modal.remove();
+            const body = { status: 'WAITING_DRIVER_ACCEPT', ambulanceId, assignedDriverId: driverId };
+            if (paramedicId) body.assignedParamedicId = paramedicId;
             await apiFetch(`/ride-requests/${id}/status`, {
               method: 'PATCH',
-              body: JSON.stringify({ status: 'WAITING_DRIVER_ACCEPT', ambulanceId, assignedDriverId: driverId }),
+              body: JSON.stringify(body),
             });
-            toast(`Dispatched! Ambulance ${amb.registrationNumber} assigned`);
+            toast(`Dispatched! ${amb.registrationNumber} → Driver${paramedicId ? ' + Paramedic' : ''}`);
             loadRides();
           };
         } catch (e) { toast(e.message, 'error'); }

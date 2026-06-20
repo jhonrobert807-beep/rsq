@@ -8,15 +8,15 @@ import {
   OnGatewayDisconnect,
   WsException,
 } from '@nestjs/websockets';
-import { UseGuards, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { ChatsService } from './chats.service';
-import { WsJwtGuard } from '../auth/guards/ws-jwt.guard';
 import { PrismaService } from '../../common/prisma/prisma.service';
 
 @WebSocketGateway({
   namespace: '/chat',
-  cors: { origin: process.env.FRONTEND_URL || 'http://localhost:59881' },
+  cors: { origin: '*' },
 })
 export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
@@ -25,6 +25,8 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly chatsService: ChatsService,
     private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async handleConnection(client: Socket) {
@@ -34,8 +36,14 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.disconnect();
         return;
       }
-      console.log(`Chat client connected: ${client.id}`);
+      const user = this.jwtService.verify(token, {
+        secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
+      });
+      // JWT payload uses 'sub' as the user id field
+      (client as any).user = { ...user, id: user.sub };
+      console.log(`Chat client connected: ${client.id} (user: ${user.sub})`);
     } catch (error) {
+      console.log(`Chat auth failed for ${client.id}:`, error?.message || error);
       client.disconnect();
     }
   }

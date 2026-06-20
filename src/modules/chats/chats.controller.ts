@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, Query, ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { ChatsService } from './chats.service';
+import { ChatsGateway } from './chats.gateway';
 import { SendMessageDto } from './dto/send-message.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -11,12 +12,20 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('chats')
 export class ChatsController {
-  constructor(private readonly service: ChatsService) {}
+  constructor(
+    private readonly service: ChatsService,
+    private readonly gateway: ChatsGateway,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Send a chat message (REST fallback)' })
-  sendMessage(@CurrentUser() user: any, @Body() dto: SendMessageDto) {
-    return this.service.sendMessage(user.id, dto);
+  async sendMessage(@CurrentUser() user: any, @Body() dto: SendMessageDto) {
+    const chat = await this.service.sendMessage(user.id, dto);
+    // Broadcast to all ride participants via WebSocket
+    this.gateway.server
+      .to(`ride-chat:${dto.rideRequestId}`)
+      .emit('newMessage', chat);
+    return chat;
   }
 
   @Get('ride/:rideRequestId')
