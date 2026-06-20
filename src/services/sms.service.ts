@@ -14,10 +14,60 @@ export class SmsService {
   private readonly apiKey = process.env.SENDPK_API_KEY;
   private readonly sender = process.env.SENDPK_SENDER_ID || 'ResqLink';
   private readonly apiUrl = 'https://sendpk.com/api/sms.php';
+  private readonly whatsappApiUrl = 'http://wa.sendpk.com/api/send.php';
+  private readonly whatsappId = process.env.SENDPK_WHATSAPP_ID || '150';
+  private readonly whatsappOtpTemplateId = process.env.SENDPK_OTP_TEMPLATE_ID || '349';
 
   async sendOtp(phoneNumber: string, code: string, name?: string): Promise<void> {
-    const message = `Your ResqLink OTP code is: ${code}. Valid for 10 minutes.${name ? ` Hi ${name}!` : ''}`;
-    await this.send(phoneNumber, message);
+    const customerName = name || 'Customer';
+    // Try WhatsApp first, fall back to SMS
+    const whatsappSent = await this.sendWhatsAppOtp(phoneNumber, customerName, code);
+    if (!whatsappSent) {
+      const message = `Your ResqLink OTP code is: ${code}. Valid for 10 minutes.`;
+      await this.send(phoneNumber, message);
+    }
+  }
+
+  async sendWhatsAppOtp(phoneNumber: string, name: string, code: string): Promise<boolean> {
+    try {
+      const normalizedPhone = this.normalizePhoneNumber(phoneNumber);
+      if (!normalizedPhone) {
+        this.logger.warn(`Invalid phone number for WhatsApp OTP: ${phoneNumber}`);
+        return false;
+      }
+
+      const templateData = JSON.stringify([
+        {
+          mobile: normalizedPhone,
+          body: [
+            { type: 'text', text: name },
+            { type: 'text', text: code },
+          ],
+        },
+      ]);
+
+      const response = await axios.get<SendPkResponse>(this.whatsappApiUrl, {
+        params: {
+          api_key: this.apiKey,
+          whatsapp_id: this.whatsappId,
+          template_id: this.whatsappOtpTemplateId,
+          template_data: templateData,
+        },
+        timeout: 10000,
+      });
+
+      if (response.data.success || response.data.status === 'success') {
+        this.logger.log(`WhatsApp OTP sent successfully to ${normalizedPhone}`);
+        return true;
+      }
+
+      const errorMsg = response.data.error || response.data.message || 'Unknown error';
+      this.logger.warn(`WhatsApp OTP failed: ${errorMsg}, falling back to SMS`);
+      return false;
+    } catch (error) {
+      this.logger.warn(`WhatsApp OTP request failed, falling back to SMS: ${error}`);
+      return false;
+    }
   }
 
   async sendVerification(phoneNumber: string, message: string): Promise<void> {

@@ -145,6 +145,42 @@ async function main() {
   });
   console.log(`  ✅ Paramedic: ${paramedic2.email} (password: Paramedic@1234)`);
 
+  // ── 1b. Driver Profiles ─────────────────────────────────────────
+  await prisma.driverProfile.upsert({
+    where: { userId: driver1.id },
+    update: {},
+    create: {
+      userId: driver1.id,
+      licenseNumber: 'LIC-001-2024',
+      experienceYears: 5,
+      status: 'VERIFIED',
+      vehicleOwner: 'Ahmed Driver',
+      vehicleType: 'Ambulance',
+      vehicleCity: 'Karachi',
+      gender: 'Male',
+      country: 'Pakistan',
+      verifiedAt: new Date(),
+    },
+  });
+
+  await prisma.driverProfile.upsert({
+    where: { userId: driver2.id },
+    update: {},
+    create: {
+      userId: driver2.id,
+      licenseNumber: 'LIC-002-2024',
+      experienceYears: 3,
+      status: 'VERIFIED',
+      vehicleOwner: 'Hassan Ali',
+      vehicleType: 'Ambulance',
+      vehicleCity: 'Karachi',
+      gender: 'Male',
+      country: 'Pakistan',
+      verifiedAt: new Date(),
+    },
+  });
+  console.log(`  ✅ Driver Profiles: Ahmed Driver, Hassan Ali`);
+
   // ── 2. Organizations ────────────────────────────────────────────
   const org1 = await prisma.organization.upsert({
     where: { id: admin.id }, // dummy — will create
