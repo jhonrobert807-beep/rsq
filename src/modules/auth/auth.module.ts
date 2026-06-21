@@ -8,6 +8,7 @@ import { GoogleStrategy } from './strategies/google.strategy';
 import { RolesGuard } from './guards/roles.guard';
 import { EmailService } from '../../services/email.service';
 import { SmsService } from '../../services/sms.service';
+import { AwsSnsService } from '../../services/aws-sns.service';
 import { DriverProfilesService } from '../driver-profiles/driver-profiles.service';
 import { ParamedicProfilesService } from '../paramedic-profiles/paramedic-profiles.service';
 
@@ -17,7 +18,7 @@ import { ParamedicProfilesService } from '../paramedic-profiles/paramedic-profil
     JwtModule.register({}),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, GoogleStrategy, RolesGuard, EmailService, SmsService, DriverProfilesService, ParamedicProfilesService],
+  providers: [AuthService, JwtStrategy, GoogleStrategy, RolesGuard, EmailService, SmsService, AwsSnsService, DriverProfilesService, ParamedicProfilesService],
   exports: [AuthService, JwtStrategy, RolesGuard],
 })
 export class AuthModule {}

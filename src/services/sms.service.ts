@@ -1,5 +1,6 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import axios, { AxiosError } from 'axios';
+import { AwsSnsService } from './aws-sns.service';
 
 interface SendPkResponse {
   success?: boolean;
@@ -18,14 +19,10 @@ export class SmsService {
   private readonly whatsappId = process.env.SENDPK_WHATSAPP_ID || '150';
   private readonly whatsappOtpTemplateId = process.env.SENDPK_OTP_TEMPLATE_ID || '349';
 
+  constructor(private readonly awsSns: AwsSnsService) {}
+
   async sendOtp(phoneNumber: string, code: string, name?: string): Promise<void> {
-    const customerName = name || 'Customer';
-    // Try WhatsApp first, fall back to SMS
-    const whatsappSent = await this.sendWhatsAppOtp(phoneNumber, customerName, code);
-    if (!whatsappSent) {
-      const message = `Your ResqLink OTP code is: ${code}. Valid for 10 minutes.`;
-      await this.send(phoneNumber, message);
-    }
+    await this.awsSns.sendOtp(phoneNumber, code);
   }
 
   async sendWhatsAppOtp(phoneNumber: string, name: string, code: string): Promise<boolean> {
@@ -71,11 +68,11 @@ export class SmsService {
   }
 
   async sendVerification(phoneNumber: string, message: string): Promise<void> {
-    await this.send(phoneNumber, message);
+    await this.awsSns.sendNotification(phoneNumber, message);
   }
 
   async sendNotification(phoneNumber: string, message: string): Promise<void> {
-    await this.send(phoneNumber, message);
+    await this.awsSns.sendNotification(phoneNumber, message);
   }
 
   /**
