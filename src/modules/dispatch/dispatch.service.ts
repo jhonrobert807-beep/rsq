@@ -131,7 +131,7 @@ export class DispatchService {
         where: {
           role: Role.DRIVER,
           isActive: true,
-          id: { notIn: excludedDriverIds.length > 0 ? excludedDriverIds : ['__none__'] },
+          ...(excludedDriverIds.length > 0 ? { id: { notIn: excludedDriverIds } } : {}),
         },
         select: { id: true, phone: true, name: true, locationLat: true, locationLng: true },
       });
@@ -189,7 +189,7 @@ export class DispatchService {
           where: {
             role: Role.PARAMEDIC,
             isActive: true,
-            id: { notIn: busyParamedicIds.length > 0 ? busyParamedicIds : ['__none__'] },
+            ...(busyParamedicIds.length > 0 ? { id: { notIn: busyParamedicIds } } : {}),
           },
           select: { id: true },
         });
