@@ -22,7 +22,11 @@ export class SmsService {
   constructor(private readonly awsSns: AwsSnsService) {}
 
   async sendOtp(phoneNumber: string, code: string, name?: string): Promise<void> {
-    await this.awsSns.sendOtp(phoneNumber, code);
+    // Try WhatsApp first (SendPK), fall back to AWS SNS
+    const waSuccess = await this.sendWhatsAppOtp(phoneNumber, name || 'User', code);
+    if (!waSuccess) {
+      await this.awsSns.sendOtp(phoneNumber, code);
+    }
   }
 
   async sendWhatsAppOtp(phoneNumber: string, name: string, code: string): Promise<boolean> {
@@ -74,6 +78,7 @@ export class SmsService {
   async sendNotification(phoneNumber: string, message: string): Promise<void> {
     await this.awsSns.sendNotification(phoneNumber, message);
   }
+
 
   /**
    * Send SMS via SendPK API
