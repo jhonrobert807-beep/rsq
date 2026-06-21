@@ -71,6 +71,16 @@ export class DriverProfilesService {
     });
   }
 
+  async updateSelf(userId: string, dto: Omit<UpdateDriverProfileDto, 'status' | 'notes'>) {
+    const profile = await this.prisma.driverProfile.findUnique({ where: { userId } });
+    if (!profile) throw new NotFoundException('Driver profile not found');
+    return this.prisma.driverProfile.update({
+      where: { userId },
+      data: dto,
+      include: { user: { select: { id: true, name: true, email: true, role: true } } },
+    });
+  }
+
   async remove(id: string) {
     await this.findOne(id);
     await this.prisma.driverProfile.delete({ where: { id } });

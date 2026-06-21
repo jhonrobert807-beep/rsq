@@ -3,7 +3,12 @@ import { Role } from '@prisma/client';
 
 export class GoogleLoginDto {
   @IsString()
-  idToken: string;
+  @IsOptional()
+  idToken?: string;
+
+  @IsString()
+  @IsOptional()
+  accessToken?: string;
 
   @IsEnum(Role)
   @IsOptional()

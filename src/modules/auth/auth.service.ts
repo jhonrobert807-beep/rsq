@@ -161,8 +161,13 @@ export class AuthService {
 
   async googleLogin(dto: GoogleLoginDto) {
     try {
-      // Verify Google ID token
-      const payload = await this.googleStrategy.verifyIdToken(dto.idToken);
+      if (!dto.idToken && !dto.accessToken) {
+        throw new BadRequestException('Either idToken or accessToken is required');
+      }
+      // Verify Google token — idToken on mobile, accessToken on web
+      const payload = dto.idToken
+        ? await this.googleStrategy.verifyIdToken(dto.idToken)
+        : await this.googleStrategy.verifyAccessToken(dto.accessToken!);
 
       if (!payload || !payload.email) {
         throw new BadRequestException('Email not provided by Google');

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, ParseUUIDPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, ParseUUIDPipe, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { Role, RegistrationStatus } from '@prisma/client';
 import { DriverProfilesService } from './driver-profiles.service';
@@ -40,6 +40,13 @@ export class DriverProfilesController {
   @ApiOperation({ summary: 'Get driver profile by user ID' })
   findByUser(@Param('userId', ParseUUIDPipe) userId: string) {
     return this.service.findByUserId(userId);
+  }
+
+  @Patch('me')
+  @Roles(Role.DRIVER)
+  @ApiOperation({ summary: 'Driver updates their own profile' })
+  updateSelf(@Request() req: any, @Body() dto: UpdateDriverProfileDto) {
+    return this.service.updateSelf(req.user.id, dto);
   }
 
   @Patch(':id')
