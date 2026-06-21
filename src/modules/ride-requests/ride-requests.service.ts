@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { Role, RideRequestStatus, AmbulanceStatus } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { DispatchService } from '../dispatch/dispatch.service';
 import { CreateRideRequestDto } from './dto/create-ride-request.dto';
 import { AdminCreateRideRequestDto } from './dto/admin-create-ride-request.dto';
 import { UpdateRideRequestStatusDto } from './dto/update-ride-request-status.dto';
@@ -14,7 +15,12 @@ const FARE_PER_KM_WITH_DOCTOR = 100; // Per-km rate for WITH_DOCTOR
 
 @Injectable()
 export class RideRequestsService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(RideRequestsService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly dispatchService: DispatchService,
+  ) {}
 
   private readonly include = {
     user: { select: { id: true, name: true, phone: true } },
@@ -67,10 +73,18 @@ export class RideRequestsService {
       data.cost = this.calculateFare(distanceKm, dto.ambulanceType);
     }
 
-    return this.prisma.rideRequest.create({
+    const ride = await this.prisma.rideRequest.create({
       data,
       include: this.include,
     });
+
+    // Trigger auto-dispatch asynchronously — patient gets instant response, dispatch runs in background
+    this.dispatchService.dispatch({
+      rideRequestId: ride.id,
+      ambulanceType: ride.ambulanceType,
+    }).catch(err => this.logger.error(`Auto-dispatch failed for ride ${ride.id}`, err));
+
+    return ride;
   }
 
   async createAsAdmin(dto: AdminCreateRideRequestDto) {
@@ -208,6 +222,8 @@ export class RideRequestsService {
       RideRequestStatus.CREATED,
       RideRequestStatus.DISPATCHING,
       RideRequestStatus.WAITING_DRIVER_ACCEPT,
+      RideRequestStatus.DRIVER_ACCEPTED,
+      RideRequestStatus.DRIVER_ARRIVED,
     ];
 
     if (!cancellableStatuses.includes(ride.status)) {
@@ -311,7 +327,7 @@ export class RideRequestsService {
     }
 
     // Reset ride to CREATED so it can be re-dispatched
-    return this.prisma.rideRequest.update({
+    const updatedRide = await this.prisma.rideRequest.update({
       where: { id },
       data: {
         status: RideRequestStatus.CREATED,
@@ -322,6 +338,14 @@ export class RideRequestsService {
       },
       include: this.include,
     });
+
+    // Re-dispatch automatically after rejection
+    this.dispatchService.dispatch({
+      rideRequestId: id,
+      ambulanceType: updatedRide.ambulanceType,
+    }).catch(err => this.logger.error(`Re-dispatch after rejection failed for ride ${id}`, err));
+
+    return updatedRide;
   }
 
   /**
