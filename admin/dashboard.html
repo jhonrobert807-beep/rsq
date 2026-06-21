@@ -860,7 +860,7 @@
     // ═══════════════════════════════════════════════════════════════
     // CORE: Auth, API, Router
     // ═══════════════════════════════════════════════════════════════
-    const API = 'http://localhost:3001/api';
+    const API = window.location.hostname === 'localhost' ? 'http://localhost:3001/api' : (window.location.origin + '/api');
     const token = localStorage.getItem('accessToken');
     const user = JSON.parse(localStorage.getItem('user') || 'null');
 
