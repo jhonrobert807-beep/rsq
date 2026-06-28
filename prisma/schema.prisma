@@ -6,9 +6,223 @@ datasource db {
   provider = "postgresql"
 }
 
-//
-// ENUMS
-//
+model User {
+  id                      String               @id @default(uuid()) @db.Uuid
+  name                    String
+  email                   String?              @unique
+  phone                   String?              @unique
+  passwordHash            String
+  role                    Role                 @default(USER)
+  verified                Boolean              @default(false)
+  locationLat             Float?
+  locationLng             Float?
+  isActive                Boolean              @default(true)
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
+  language                String               @default("en")
+  notificationPreferences Json?
+  resetCode               String?
+  resetCodeExpiresAt      DateTime?
+  adminActions            AdminAction[]        @relation("AdminActor")
+  receivedChats           Chat[]               @relation("ChatReceiver")
+  sentChats               Chat[]               @relation("ChatSender")
+  driverPerformance       DriverPerformance?
+  driverProfile           DriverProfile?
+  paramedicProfile        ParamedicProfile?
+  assignedDriverJobs      RideRequest[]        @relation("AssignedDriver")
+  assignedParamedicJobs   RideRequest[]        @relation("AssignedParamedic")
+  rideRequests            RideRequest[]        @relation("UserRequests")
+  dispatchAttempts        RideRequestAttempt[] @relation("AttemptDriver")
+
+  @@index([role])
+  @@index([createdAt])
+}
+
+model Organization {
+  id           String      @id @default(uuid()) @db.Uuid
+  name         String
+  address      String?
+  contactEmail String?
+  contactPhone String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  ambulances   Ambulance[]
+
+  @@index([name])
+}
+
+model Ambulance {
+  id                 String              @id @default(uuid()) @db.Uuid
+  registrationNumber String?             @unique
+  type               AmbulanceType       @default(BASIC)
+  status             AmbulanceStatus     @default(AVAILABLE)
+  currentLat         Float?
+  currentLng         Float?
+  organizationId     String              @db.Uuid
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  organization       Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  trackingLogs       AmbulanceTracking[]
+  rideRequests       RideRequest[]
+
+  @@index([organizationId])
+  @@index([status])
+}
+
+model RideRequest {
+  id                  String               @id @default(uuid()) @db.Uuid
+  userId              String               @db.Uuid
+  ambulanceType       AmbulanceType
+  pickupLat           Float
+  pickupLng           Float
+  destinationLat      Float?
+  destinationLng      Float?
+  status              RideRequestStatus    @default(CREATED)
+  assignedDriverId    String?              @db.Uuid
+  assignedParamedicId String?              @db.Uuid
+  ambulanceId         String?              @db.Uuid
+  cost                Float?
+  paymentStatus       PaymentStatus        @default(PENDING)
+  paymentMethod       PaymentMethod        @default(CASH)
+  etaMinutes          Int?
+  routeData           Json?
+  requestedAt         DateTime             @default(now())
+  statusUpdatedAt     DateTime             @default(now())
+  completedAt         DateTime?
+  cancelledAt         DateTime?
+  distanceKm          Float?
+  userRating          Float?
+  trackingLogs        AmbulanceTracking[]
+  chats               Chat[]
+  ambulance           Ambulance?           @relation(fields: [ambulanceId], references: [id])
+  assignedDriver      User?                @relation("AssignedDriver", fields: [assignedDriverId], references: [id])
+  assignedParamedic   User?                @relation("AssignedParamedic", fields: [assignedParamedicId], references: [id])
+  user                User                 @relation("UserRequests", fields: [userId], references: [id], onDelete: Cascade)
+  attempts            RideRequestAttempt[]
+
+  @@index([status])
+  @@index([requestedAt])
+  @@index([userId])
+  @@index([assignedDriverId])
+  @@index([ambulanceId])
+}
+
+model RideRequestAttempt {
+  id            String                @id @default(uuid()) @db.Uuid
+  rideRequestId String                @db.Uuid
+  driverId      String                @db.Uuid
+  status        DispatchAttemptStatus @default(SENT)
+  sentAt        DateTime              @default(now())
+  respondedAt   DateTime?
+  expiresAt     DateTime?
+  reason        String?
+  driver        User                  @relation("AttemptDriver", fields: [driverId], references: [id], onDelete: Cascade)
+  rideRequest   RideRequest           @relation(fields: [rideRequestId], references: [id], onDelete: Cascade)
+
+  @@unique([rideRequestId, driverId, sentAt])
+  @@index([rideRequestId, sentAt])
+  @@index([driverId, sentAt])
+}
+
+model AmbulanceTracking {
+  id            String       @id @default(uuid()) @db.Uuid
+  ambulanceId   String       @db.Uuid
+  rideRequestId String?      @db.Uuid
+  lat           Float
+  lng           Float
+  recordedAt    DateTime     @default(now())
+  ambulance     Ambulance    @relation(fields: [ambulanceId], references: [id], onDelete: Cascade)
+  rideRequest   RideRequest? @relation(fields: [rideRequestId], references: [id])
+
+  @@index([ambulanceId, recordedAt])
+  @@index([rideRequestId, recordedAt])
+}
+
+model Chat {
+  id            String          @id @default(uuid()) @db.Uuid
+  rideRequestId String          @db.Uuid
+  senderId      String          @db.Uuid
+  receiverId    String          @db.Uuid
+  messageType   ChatMessageType @default(TEXT)
+  message       String
+  sentAt        DateTime        @default(now())
+  receiver      User            @relation("ChatReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  rideRequest   RideRequest     @relation(fields: [rideRequestId], references: [id], onDelete: Cascade)
+  sender        User            @relation("ChatSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([rideRequestId, sentAt])
+  @@index([senderId])
+  @@index([receiverId])
+}
+
+model ParamedicProfile {
+  id              String             @id @default(uuid()) @db.Uuid
+  userId          String             @unique @db.Uuid
+  experienceYears Int?
+  status          RegistrationStatus @default(PENDING)
+  notes           String?
+  verifiedAt      DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DriverProfile {
+  id                        String             @id @default(uuid()) @db.Uuid
+  userId                    String             @unique @db.Uuid
+  licenseNumber             String?
+  experienceYears           Int?
+  status                    RegistrationStatus @default(PENDING)
+  notes                     String?
+  verifiedAt                DateTime?
+  createdAt                 DateTime           @default(now())
+  updatedAt                 DateTime           @updatedAt
+  country                   String?
+  gender                    String?
+  vehicleCity               String?
+  vehicleOwner              String?
+  vehicleRegistrationNumber String?
+  vehicleType               String?
+  user                      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+model DriverPerformance {
+  id                  String    @id @default(uuid()) @db.Uuid
+  driverId            String    @unique @db.Uuid
+  totalRides          Int       @default(0)
+  averageResponseTime Float?
+  rating              Float?
+  lastActive          DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  driver              User      @relation(fields: [driverId], references: [id], onDelete: Cascade)
+}
+
+model AdminAction {
+  id        String   @id @default(uuid()) @db.Uuid
+  adminId   String   @db.Uuid
+  action    String
+  targetId  String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  admin     User     @relation("AdminActor", fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId, createdAt])
+}
+
+model OtpCode {
+  id         String   @id @default(uuid()) @db.Uuid
+  identifier String
+  code       String
+  expiresAt  DateTime
+  used       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([identifier])
+}
+
 enum Role {
   USER
   DRIVER
@@ -71,286 +285,4 @@ enum DispatchAttemptStatus {
   REJECTED
   TIMEOUT
   CANCELLED
-}
-
-//
-// MODELS
-//
-
-model User {
-  id           String  @id @default(uuid()) @db.Uuid
-  name         String
-  email        String? @unique
-  phone        String? @unique
-  passwordHash String
-  role         Role    @default(USER)
-  verified     Boolean @default(false)
-
-  // Optional: last known location (NOT tracking history)
-  locationLat Float?
-  locationLng Float?
-
-  // User preferences
-  language String @default("en")
-  notificationPreferences Json?
-
-  // Password reset
-  resetCode String?
-  resetCodeExpiresAt DateTime?
-
-  isActive Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  rideRequests          RideRequest[] @relation("UserRequests")
-  assignedDriverJobs    RideRequest[] @relation("AssignedDriver")
-  assignedParamedicJobs RideRequest[] @relation("AssignedParamedic")
-
-  paramedicProfile  ParamedicProfile?
-  driverProfile     DriverProfile?
-  driverPerformance DriverPerformance?
-
-  adminActions AdminAction[] @relation("AdminActor")
-
-  sentChats     Chat[] @relation("ChatSender")
-  receivedChats Chat[] @relation("ChatReceiver")
-
-  dispatchAttempts RideRequestAttempt[] @relation("AttemptDriver")
-
-  @@index([role])
-  @@index([createdAt])
-}
-
-model Organization {
-  id           String  @id @default(uuid()) @db.Uuid
-  name         String
-  address      String?
-  contactEmail String?
-  contactPhone String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  ambulances Ambulance[]
-
-  @@index([name])
-}
-
-model Ambulance {
-  id                 String          @id @default(uuid()) @db.Uuid
-  registrationNumber String?         @unique
-  type               AmbulanceType   @default(BASIC)
-  status             AmbulanceStatus @default(AVAILABLE)
-
-  // latest location for quick reads (history goes to AmbulanceTracking)
-  currentLat Float?
-  currentLng Float?
-
-  organizationId String       @db.Uuid
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  rideRequests RideRequest[]
-  trackingLogs AmbulanceTracking[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([organizationId])
-  @@index([status])
-}
-
-model RideRequest {
-  id String @id @default(uuid()) @db.Uuid
-
-  userId String @db.Uuid
-  user   User   @relation("UserRequests", fields: [userId], references: [id], onDelete: Cascade)
-
-  ambulanceType AmbulanceType
-  pickupLat     Float
-  pickupLng     Float
-
-  destinationLat Float?
-  destinationLng Float?
-
-  status RideRequestStatus @default(CREATED)
-
-  // Assignment (single source of truth)
-  assignedDriverId String? @db.Uuid
-  assignedDriver   User?   @relation("AssignedDriver", fields: [assignedDriverId], references: [id], onDelete: SetNull)
-
-  assignedParamedicId String? @db.Uuid
-  assignedParamedic   User?   @relation("AssignedParamedic", fields: [assignedParamedicId], references: [id], onDelete: SetNull)
-
-  ambulanceId String?    @db.Uuid
-  ambulance   Ambulance? @relation(fields: [ambulanceId], references: [id], onDelete: SetNull)
-
-  // Pricing/Payment (MVP)
-  cost          Float?
-  paymentStatus PaymentStatus @default(PENDING)
-  paymentMethod PaymentMethod @default(CASH)
-
-  // User rating (1-5, set after ride is completed)
-  userRating Float?
-
-  // Routing payload
-  distanceKm Float?
-  etaMinutes Int?
-  routeData  Json?
-
-  requestedAt     DateTime  @default(now())
-  statusUpdatedAt DateTime  @default(now())
-  completedAt     DateTime?
-  cancelledAt     DateTime?
-
-  // Relations
-  attempts     RideRequestAttempt[]
-  chats        Chat[]
-  trackingLogs AmbulanceTracking[]
-
-  @@index([status])
-  @@index([requestedAt])
-  @@index([userId])
-  @@index([assignedDriverId])
-  @@index([ambulanceId])
-}
-
-model RideRequestAttempt {
-  id String @id @default(uuid()) @db.Uuid
-
-  rideRequestId String      @db.Uuid
-  rideRequest   RideRequest @relation(fields: [rideRequestId], references: [id], onDelete: Cascade)
-
-  driverId String @db.Uuid
-  driver   User   @relation("AttemptDriver", fields: [driverId], references: [id], onDelete: Cascade)
-
-  status DispatchAttemptStatus @default(SENT)
-
-  sentAt      DateTime  @default(now())
-  respondedAt DateTime?
-  expiresAt   DateTime? // useful for timeout windows
-  reason      String? // e.g., "NO_RESPONSE", "REJECTED", "OFFLINE"
-
-  @@unique([rideRequestId, driverId, sentAt])
-  @@index([rideRequestId, sentAt])
-  @@index([driverId, sentAt])
-}
-
-model AmbulanceTracking {
-  id String @id @default(uuid()) @db.Uuid
-
-  ambulanceId String    @db.Uuid
-  ambulance   Ambulance @relation(fields: [ambulanceId], references: [id], onDelete: Cascade)
-
-  rideRequestId String?      @db.Uuid
-  rideRequest   RideRequest? @relation(fields: [rideRequestId], references: [id], onDelete: SetNull)
-
-  lat        Float
-  lng        Float
-  recordedAt DateTime @default(now())
-
-  @@index([ambulanceId, recordedAt])
-  @@index([rideRequestId, recordedAt])
-}
-
-model Chat {
-  id String @id @default(uuid()) @db.Uuid
-
-  rideRequestId String      @db.Uuid
-  rideRequest   RideRequest @relation(fields: [rideRequestId], references: [id], onDelete: Cascade)
-
-  // skipping Sent_By as requested:
-  senderId String @db.Uuid
-  sender   User   @relation("ChatSender", fields: [senderId], references: [id], onDelete: Cascade)
-
-  receiverId String @db.Uuid
-  receiver   User   @relation("ChatReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
-
-  messageType ChatMessageType @default(TEXT)
-  message     String
-  sentAt      DateTime        @default(now())
-
-  @@index([rideRequestId, sentAt])
-  @@index([senderId])
-  @@index([receiverId])
-}
-
-model ParamedicProfile {
-  id     String @id @default(uuid()) @db.Uuid
-  userId String @unique @db.Uuid
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  experienceYears Int?
-  status          RegistrationStatus @default(PENDING)
-  notes           String?
-
-  verifiedAt DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-}
-
-model DriverProfile {
-  id     String @id @default(uuid()) @db.Uuid
-  userId String @unique @db.Uuid
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  licenseNumber   String?
-  experienceYears Int?
-  status          RegistrationStatus @default(PENDING)
-  notes           String?
-
-  // Vehicle Information
-  vehicleOwner          String?
-  vehicleRegistrationNumber String?
-  vehicleType           String?
-  vehicleCity           String?
-  gender                String?
-  country               String?
-
-  verifiedAt DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  @@index([status])
-}
-
-model DriverPerformance {
-  id       String @id @default(uuid()) @db.Uuid
-  driverId String @unique @db.Uuid
-  driver   User   @relation(fields: [driverId], references: [id], onDelete: Cascade)
-
-  totalRides          Int       @default(0)
-  averageResponseTime Float?
-  rating              Float?
-  lastActive          DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model AdminAction {
-  id String @id @default(uuid()) @db.Uuid
-
-  adminId String @db.Uuid
-  admin   User   @relation("AdminActor", fields: [adminId], references: [id], onDelete: Cascade)
-
-  action   String
-  targetId String?
-  metadata Json?
-
-  createdAt DateTime @default(now())
-
-  @@index([adminId, createdAt])
-}
-
-model OtpCode {
-  id         String   @id @default(uuid()) @db.Uuid
-  identifier String
-  code       String
-  expiresAt  DateTime
-  used       Boolean  @default(false)
-  createdAt  DateTime @default(now())
-
-  @@index([identifier])
 }
