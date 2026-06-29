@@ -942,6 +942,14 @@
       return `<span class="status-badge ${cls}">${label}</span>`;
     }
 
+    // ── Payment badge helper ───
+    function paymentBadge(paymentStatus, paymentMethod) {
+      const colors = { PAID: '#2E7D32', PENDING: '#E65100', FAILED: '#C62828', REFUNDED: '#1565C0' };
+      const color = colors[paymentStatus] || '#757575';
+      const method = paymentMethod || 'CASH';
+      return `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;background:${color}20;color:${color}">${paymentStatus} · ${method}</span>`;
+    }
+
     // ── Format date ───
     function fmtDate(d) {
       if (!d) return '—';
@@ -1545,8 +1553,8 @@
               </select>
             </div>
           </div>
-          <table><thead><tr><th>Requested By</th><th>Type</th><th>Status</th><th>Driver</th><th>Ambulance</th><th>ETA</th><th>Pickup</th><th>Requested At</th><th>Actions</th></tr></thead>
-          <tbody id="rides-table"><tr class="loading-row"><td colspan="9"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
+          <table><thead><tr><th>Requested By</th><th>Type</th><th>Status</th><th>Driver</th><th>Ambulance</th><th>ETA</th><th>Payment</th><th>Pickup</th><th>Requested At</th><th>Actions</th></tr></thead>
+          <tbody id="rides-table"><tr class="loading-row"><td colspan="10"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
         </div>
       `;
 
@@ -1557,7 +1565,7 @@
           const data = await apiFetch(`/ride-requests${qs}`);
           const tbody = document.getElementById('rides-table');
           if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No ride requests found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No ride requests found</td></tr>';
             return;
           }
           tbody.innerHTML = data.map(r => `<tr>
@@ -1567,6 +1575,7 @@
             <td>${r.assignedDriver ? r.assignedDriver.name : '—'}</td>
             <td>${r.ambulance ? r.ambulance.registrationNumber || r.ambulance.type : '—'}</td>
             <td>${r.etaMinutes ? r.etaMinutes + ' min' : '—'}</td>
+            <td>${paymentBadge(r.paymentStatus, r.paymentMethod)}</td>
             <td>${fmtGps(r.pickupLat, r.pickupLng)}</td>
             <td>${fmtDate(r.requestedAt)}</td>
             <td>
@@ -1678,7 +1687,7 @@
                   <div class="detail-row"><span class="label">Patient</span><span>${r.user ? r.user.name : '—'}</span></div>
                   <div class="detail-row"><span class="label">Phone</span><span>${r.user?.phone || '—'}</span></div>
                   <div class="detail-row"><span class="label">ETA</span><span>${r.etaMinutes ? r.etaMinutes + ' min' : '—'}</span></div>
-                  <div class="detail-row"><span class="label">Payment</span><span>${r.paymentMethod} (${r.paymentStatus})</span></div>
+                  <div class="detail-row"><span class="label">Payment</span>${paymentBadge(r.paymentStatus, r.paymentMethod)}</div>
                 </div>
                 <div class="detail-card">
                   <h4>Assignment</h4>
