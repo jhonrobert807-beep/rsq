@@ -25,7 +25,7 @@ export class RideRequestsService {
   private readonly include = {
     user: { select: { id: true, name: true, phone: true } },
     assignedDriver: { select: { id: true, name: true, phone: true } },
-    assignedParamedic: { select: { id: true, name: true } },
+    assignedParamedic: { select: { id: true, name: true, phone: true } },
     ambulance: { select: { id: true, registrationNumber: true, type: true, status: true } },
   };
 

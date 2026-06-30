@@ -175,9 +175,9 @@ export class DispatchService {
           this.haversineDistance(pickupLat, pickupLng, b.locationLat, b.locationLng!)
         );
       });
-      const chosenDriver = sortedDrivers[0];
+      let chosenDriver = sortedDrivers[0];
 
-      // 6. For WITH_DOCTOR: find an available paramedic
+      // 6. For WITH_DOCTOR: find an available driver-paramedic pair
       let chosenParamedicId: string | null = null;
       if (data.ambulanceType === AmbulanceType.WITH_DOCTOR) {
         const busyParamedicIds = await this.prisma.rideRequest.findMany({
@@ -185,20 +185,54 @@ export class DispatchService {
           select: { assignedParamedicId: true },
         }).then(rows => rows.map(r => r.assignedParamedicId as string));
 
-        const paramedic = await this.prisma.user.findFirst({
+        // Find drivers with a paired paramedic where BOTH are available
+        const pairedDrivers = await this.prisma.user.findMany({
           where: {
-            role: Role.PARAMEDIC,
+            role: Role.DRIVER,
             isActive: true,
-            ...(busyParamedicIds.length > 0 ? { id: { notIn: busyParamedicIds } } : {}),
+            pairedParamedicId: { not: null },
+            ...(excludedDriverIds.length > 0 ? { id: { notIn: excludedDriverIds } } : {}),
           },
-          select: { id: true },
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            locationLat: true,
+            locationLng: true,
+            pairedParamedicId: true,
+            pairedParamedic: { select: { id: true, isActive: true } },
+          },
         });
 
-        if (paramedic) {
-          chosenParamedicId = paramedic.id;
-        } else {
-          this.logger.warn(`No available paramedic for WITH_DOCTOR ride ${ride.id} — dispatching without`);
+        const availablePairs = pairedDrivers.filter(d =>
+          d.pairedParamedic?.isActive &&
+          !busyParamedicIds.includes(d.pairedParamedicId!)
+        );
+
+        if (availablePairs.length === 0) {
+          await this.prisma.rideRequest.update({
+            where: { id: ride.id },
+            data: { status: RideRequestStatus.FAILED_NO_DRIVER, statusUpdatedAt: new Date() },
+          });
+          this.logger.warn(`No available driver-paramedic pairs for WITH_DOCTOR ride ${ride.id}`);
+          return { success: false, message: 'No available driver-paramedic pairs' };
         }
+
+        // Pick nearest pair by driver location
+        const sortedPairs = [...availablePairs].sort((a, b) => {
+          if (!pickupLat || !pickupLng || !a.locationLat || !b.locationLat) return 0;
+          return (
+            this.haversineDistance(pickupLat, pickupLng, a.locationLat, a.locationLng!) -
+            this.haversineDistance(pickupLat, pickupLng, b.locationLat, b.locationLng!)
+          );
+        });
+
+        const chosenPair = sortedPairs[0];
+        // Override the independently chosen driver with the paired driver
+        chosenDriver = chosenPair;
+        chosenParamedicId = chosenPair.pairedParamedicId!;
+
+        this.logger.log(`WITH_DOCTOR pair: driver ${chosenDriver.id} + paramedic ${chosenParamedicId}`);
       }
 
       // 7. Commit in a transaction

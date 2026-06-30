@@ -114,6 +114,46 @@ export class UsersService {
     return { message: 'User deleted successfully' };
   }
 
+  async setPairedParamedic(driverId: string, pairedParamedicId: string | null) {
+    const driver = await this.prisma.user.findUnique({ where: { id: driverId } });
+    if (!driver) throw new NotFoundException('Driver not found');
+
+    if (pairedParamedicId) {
+      const paramedic = await this.prisma.user.findUnique({ where: { id: pairedParamedicId } });
+      if (!paramedic) throw new NotFoundException('Paramedic not found');
+    }
+
+    return this.prisma.user.update({
+      where: { id: driverId },
+      data: { pairedParamedicId },
+      select: {
+        ...userSelect,
+        pairedParamedicId: true,
+        pairedParamedic: { select: { id: true, name: true, phone: true } },
+      },
+    });
+  }
+
+  async getDrivers() {
+    return this.prisma.user.findMany({
+      where: { role: 'DRIVER' },
+      select: {
+        ...userSelect,
+        pairedParamedicId: true,
+        pairedParamedic: { select: { id: true, name: true, phone: true } },
+      },
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  async getParamedics() {
+    return this.prisma.user.findMany({
+      where: { role: 'PARAMEDIC' },
+      select: { id: true, name: true, phone: true, isActive: true },
+      orderBy: { name: 'asc' },
+    });
+  }
+
   private async checkUniqueness(
     email?: string,
     phone?: string,

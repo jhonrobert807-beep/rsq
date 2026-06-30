@@ -1418,9 +1418,10 @@
             <td>${p.experienceYears != null ? p.experienceYears + ' yrs' : '—'}</td>
             <td>${statusBadge(p.status)}</td>
             <td>${fmtDate(p.verifiedAt)}</td>
-            <td>
+            <td style="min-width:140px">
               ${p.status === 'PENDING' ? `<button class="btn btn-sm btn-success" data-verify-drv="${p.id}">Verify</button>
               <button class="btn btn-sm btn-danger" data-reject-drv="${p.id}">Reject</button>` : ''}
+              <button class="btn btn-sm" style="background:#1565C0;color:#fff" data-pair-drv="${p.user ? p.user.id : ''}" title="Assign Paramedic">🩺 Pair</button>
               <button class="btn-icon" data-delete-drv="${p.id}" title="Delete">&#10006;</button>
             </td>
           </tr>`).join('');
@@ -1434,9 +1435,11 @@
         const verifyBtn = e.target.closest('[data-verify-drv]');
         const rejectBtn = e.target.closest('[data-reject-drv]');
         const deleteBtn = e.target.closest('[data-delete-drv]');
+        const pairBtn = e.target.closest('[data-pair-drv]');
         if (verifyBtn) verifyDriver(verifyBtn.dataset.verifyDrv);
         if (rejectBtn) rejectDriver(rejectBtn.dataset.rejectDrv);
         if (deleteBtn) deleteDriver(deleteBtn.dataset.deleteDrv);
+        if (pairBtn && pairBtn.dataset.pairDrv) assignParamedic(pairBtn.dataset.pairDrv);
       });
 
       loadDrivers();
@@ -1522,6 +1525,50 @@
           toast('Profile deleted');
           loadDrivers();
         } catch (e) { toast(e.message, 'error'); }
+      }
+
+      async function assignParamedic(driverUserId) {
+        let paramedics = [];
+        let currentDriver = null;
+        try {
+          paramedics = await apiFetch('/users?role=PARAMEDIC') || [];
+          const drivers = await apiFetch('/users/role/drivers') || [];
+          currentDriver = drivers.find(d => d.id === driverUserId);
+        } catch (e) {}
+
+        const currentPairedId = currentDriver?.pairedParamedicId || '';
+
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+          <div class="modal" style="max-width:420px">
+            <h2>🩺 Assign Paramedic Partner</h2>
+            <p style="color:#888;margin-bottom:16px">Select the paramedic paired with this driver for WITH_DOCTOR rides.</p>
+            <div class="form-group">
+              <label>Paramedic</label>
+              <select id="paramedicSelect">
+                <option value="">— None (remove pairing) —</option>
+                ${paramedics.map(p => `<option value="${p.id}" ${p.id === currentPairedId ? 'selected' : ''}>${p.name} ${p.phone ? '('+p.phone+')' : ''}</option>`).join('')}
+              </select>
+            </div>
+            <div class="modal-actions">
+              <button class="btn btn-outline" id="pairCancel">Cancel</button>
+              <button class="btn btn-primary" id="pairSave">Save Pairing</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+        document.getElementById('pairCancel').addEventListener('click', () => overlay.remove());
+        document.getElementById('pairSave').addEventListener('click', async () => {
+          const selected = document.getElementById('paramedicSelect').value || null;
+          try {
+            await apiFetch(`/users/${driverUserId}/pair`, { method: 'PATCH', body: JSON.stringify({ pairedParamedicId: selected }) });
+            toast(selected ? 'Paramedic assigned successfully' : 'Pairing removed');
+            overlay.remove();
+            loadDrivers();
+          } catch (e) { toast(e.message, 'error'); }
+        });
       }
     };
 

@@ -23,6 +23,9 @@ model User {
   notificationPreferences Json?
   resetCode               String?
   resetCodeExpiresAt      DateTime?
+  pairedParamedicId       String?              @db.Uuid
+  pairedParamedic         User?                @relation("DriverParamedicPair", fields: [pairedParamedicId], references: [id])
+  pairedWithDriver        User[]               @relation("DriverParamedicPair")
   adminActions            AdminAction[]        @relation("AdminActor")
   receivedChats           Chat[]               @relation("ChatReceiver")
   sentChats               Chat[]               @relation("ChatSender")

@@ -69,4 +69,28 @@ export class UsersController {
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.remove(id);
   }
+
+  @Patch(':id/pair')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Assign or remove paired paramedic for a driver (Admin only)' })
+  setPairedParamedic(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: { pairedParamedicId: string | null },
+  ) {
+    return this.usersService.setPairedParamedic(id, body.pairedParamedicId);
+  }
+
+  @Get('role/drivers')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'List all drivers with their paired paramedic (Admin only)' })
+  getDrivers() {
+    return this.usersService.getDrivers();
+  }
+
+  @Get('role/paramedics')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'List all paramedics (Admin only)' })
+  getParamedics() {
+    return this.usersService.getParamedics();
+  }
 }
