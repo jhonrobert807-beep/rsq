@@ -111,8 +111,8 @@ export class RideRequestsController {
   }
 
   @Patch(':id/payment')
-  @Roles(Role.ADMIN, Role.DRIVER)
-  @ApiOperation({ summary: 'Update payment status (Admin/Driver)' })
+  @Roles(Role.ADMIN, Role.DRIVER, Role.USER)
+  @ApiOperation({ summary: 'Update payment status (Admin/Driver/User)' })
   updatePayment(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdatePaymentDto,
