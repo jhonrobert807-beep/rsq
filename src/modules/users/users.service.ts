@@ -121,6 +121,10 @@ export class UsersService {
     if (pairedParamedicId) {
       const paramedic = await this.prisma.user.findUnique({ where: { id: pairedParamedicId } });
       if (!paramedic) throw new NotFoundException('Paramedic not found');
+      // Ensure the paramedic user is active so dispatch can find them
+      if (!paramedic.isActive) {
+        await this.prisma.user.update({ where: { id: pairedParamedicId }, data: { isActive: true } });
+      }
     }
 
     return this.prisma.user.update({

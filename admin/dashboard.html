@@ -1396,8 +1396,8 @@
               </select>
             </div>
           </div>
-          <table><thead><tr><th>Name</th><th>Email</th><th>License #</th><th>Experience</th><th>Status</th><th>Verified At</th><th>Actions</th></tr></thead>
-          <tbody id="drv-table"><tr class="loading-row"><td colspan="7"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
+          <table><thead><tr><th>Name</th><th>Email</th><th>License #</th><th>Experience</th><th>Paramedic Partner</th><th>Status</th><th>Verified At</th><th>Actions</th></tr></thead>
+          <tbody id="drv-table"><tr class="loading-row"><td colspan="8"><span class="spinner-inline"></span> Loading...</td></tr></tbody></table>
         </div>
       `;
 
@@ -1405,26 +1405,41 @@
         const status = document.getElementById('drvStatusFilter').value;
         const qs = status ? `?status=${status}` : '';
         try {
-          const data = await apiFetch(`/driver-profiles${qs}`);
+          const [data, driverUsers] = await Promise.all([
+            apiFetch(`/driver-profiles${qs}`),
+            apiFetch('/users/role/drivers').catch(() => []),
+          ]);
           const tbody = document.getElementById('drv-table');
           if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No driver profiles found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No driver profiles found</td></tr>';
             return;
           }
-          tbody.innerHTML = data.map(p => `<tr>
-            <td>${p.user ? p.user.name : '—'}</td>
-            <td>${p.user ? p.user.email || '—' : '—'}</td>
-            <td>${p.licenseNumber || '—'}</td>
-            <td>${p.experienceYears != null ? p.experienceYears + ' yrs' : '—'}</td>
-            <td>${statusBadge(p.status)}</td>
-            <td>${fmtDate(p.verifiedAt)}</td>
-            <td style="min-width:140px">
-              ${p.status === 'PENDING' ? `<button class="btn btn-sm btn-success" data-verify-drv="${p.id}">Verify</button>
-              <button class="btn btn-sm btn-danger" data-reject-drv="${p.id}">Reject</button>` : ''}
-              <button class="btn btn-sm" style="background:#1565C0;color:#fff" data-pair-drv="${p.user ? p.user.id : ''}" title="Assign Paramedic">🩺 Pair</button>
-              <button class="btn-icon" data-delete-drv="${p.id}" title="Delete">&#10006;</button>
-            </td>
-          </tr>`).join('');
+          // Build a map of userId → pairedParamedic
+          const pairMap = {};
+          (driverUsers || []).forEach(d => { pairMap[d.id] = d.pairedParamedic; });
+
+          tbody.innerHTML = data.map(p => {
+            const userId = p.user ? p.user.id : null;
+            const paired = userId ? pairMap[userId] : null;
+            const pairedCell = paired
+              ? `<span style="display:inline-flex;align-items:center;gap:6px;background:#e8f5e9;color:#2e7d32;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;">🩺 ${paired.name}</span>`
+              : `<span style="color:#999;font-size:12px;">— not paired —</span>`;
+            return `<tr>
+              <td>${p.user ? p.user.name : '—'}</td>
+              <td>${p.user ? p.user.email || '—' : '—'}</td>
+              <td>${p.licenseNumber || '—'}</td>
+              <td>${p.experienceYears != null ? p.experienceYears + ' yrs' : '—'}</td>
+              <td>${pairedCell}</td>
+              <td>${statusBadge(p.status)}</td>
+              <td>${fmtDate(p.verifiedAt)}</td>
+              <td style="min-width:140px">
+                ${p.status === 'PENDING' ? `<button class="btn btn-sm btn-success" data-verify-drv="${p.id}">Verify</button>
+                <button class="btn btn-sm btn-danger" data-reject-drv="${p.id}">Reject</button>` : ''}
+                <button class="btn btn-sm" style="background:#1565C0;color:#fff" data-pair-drv="${userId || ''}" title="Assign Paramedic">🩺 Pair</button>
+                <button class="btn-icon" data-delete-drv="${p.id}" title="Delete">&#10006;</button>
+              </td>
+            </tr>`;
+          }).join('');
         } catch (e) { toast('Failed to load profiles', 'error'); }
       }
 
@@ -1528,15 +1543,17 @@
       }
 
       async function assignParamedic(driverUserId) {
-        let paramedics = [];
+        let paramedicProfiles = [];
         let currentDriver = null;
         try {
-          paramedics = await apiFetch('/users?role=PARAMEDIC') || [];
+          paramedicProfiles = await apiFetch('/paramedic-profiles') || [];
           const drivers = await apiFetch('/users/role/drivers') || [];
           currentDriver = drivers.find(d => d.id === driverUserId);
         } catch (e) {}
 
         const currentPairedId = currentDriver?.pairedParamedicId || '';
+        // Only show verified paramedics that have a linked user
+        const verified = paramedicProfiles.filter(p => p.status === 'VERIFIED' && p.user);
 
         const overlay = document.createElement('div');
         overlay.className = 'modal-overlay';
@@ -1548,7 +1565,7 @@
               <label>Paramedic</label>
               <select id="paramedicSelect">
                 <option value="">— None (remove pairing) —</option>
-                ${paramedics.map(p => `<option value="${p.id}" ${p.id === currentPairedId ? 'selected' : ''}>${p.name} ${p.phone ? '('+p.phone+')' : ''}</option>`).join('')}
+                ${verified.map(p => `<option value="${p.user.id}" ${p.user.id === currentPairedId ? 'selected' : ''}>${p.user.name} ${p.user.phone ? '('+p.user.phone+')' : ''}</option>`).join('')}
               </select>
             </div>
             <div class="modal-actions">

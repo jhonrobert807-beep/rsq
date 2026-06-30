@@ -26,7 +26,7 @@ export class ParamedicProfilesService {
 
     return this.prisma.paramedicProfile.findMany({
       where,
-      include: { user: { select: { id: true, name: true, email: true, role: true } } },
+      include: { user: { select: { id: true, name: true, email: true, phone: true, role: true } } },
       orderBy: { createdAt: 'desc' },
     });
   }
