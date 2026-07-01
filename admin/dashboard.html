@@ -860,7 +860,7 @@
     // ═══════════════════════════════════════════════════════════════
     // CORE: Auth, API, Router
     // ═══════════════════════════════════════════════════════════════
-    const API = window.location.hostname === 'localhost' ? 'http://localhost:3001/api' : (window.location.origin + '/api');
+    const API = window.location.hostname === 'localhost' ? 'http://localhost:3001/api' : 'https://gleaming-inspiration-production-64dc.up.railway.app/api';
     const token = localStorage.getItem('accessToken');
     const user = JSON.parse(localStorage.getItem('user') || 'null');
 

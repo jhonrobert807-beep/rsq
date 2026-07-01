@@ -219,7 +219,7 @@
   </div>
 
   <script>
-    const API = window.location.hostname === 'localhost' ? 'http://localhost:3001/api' : (window.location.origin + '/api');
+    const API = window.location.hostname === 'localhost' ? 'http://localhost:3001/api' : 'https://gleaming-inspiration-production-64dc.up.railway.app/api';
 
     // Redirect if already logged in
     if (localStorage.getItem('accessToken')) {
