@@ -26,6 +26,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
+  // Specific routes MUST come before wildcard (:userId) routes
   @Get('preferences/:userId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -50,13 +51,15 @@ export class NotificationsController {
     return this.notificationsService.updatePreferences(userId, dto);
   }
 
-  @Get(':userId')
+  @Post(':userId/clear')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get all notifications for user' })
-  @ApiResponse({ status: 200, description: 'List of notifications' })
-  getNotifications(@Param('userId') userId: string) {
-    return this.notificationsService.getNotifications(userId);
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Clear all notifications for user' })
+  @ApiResponse({ status: 200, description: 'All notifications cleared' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  clearAllNotifications(@Param('userId') userId: string) {
+    return this.notificationsService.clearAllNotifications(userId);
   }
 
   @Patch(':notificationId/read')
@@ -81,14 +84,12 @@ export class NotificationsController {
     return this.notificationsService.deleteNotification(notificationId);
   }
 
-  @Post(':userId/clear')
+  @Get(':userId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Clear all notifications for user' })
-  @ApiResponse({ status: 200, description: 'All notifications cleared' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  clearAllNotifications(@Param('userId') userId: string) {
-    return this.notificationsService.clearAllNotifications(userId);
+  @ApiOperation({ summary: 'Get all notifications for user' })
+  @ApiResponse({ status: 200, description: 'List of notifications' })
+  getNotifications(@Param('userId') userId: string) {
+    return this.notificationsService.getNotifications(userId);
   }
 }
